@@ -11,6 +11,10 @@ function bePositive($arr) {
     //hint: may want to use var_dump() to show final data types
     //---------UCID: sjc65--------------
     //---------Date: 06/05/2023---------
+    //Explanation: As the code iterates over each value in the array sets,
+    //it checks to see if each value is positive or negative. If a value is
+    //negative, then it is converted to a positive before adding them to a 
+    //new array, which is then printed.
     $nums = count($arr);
     $pos = array();
     $x = 0;

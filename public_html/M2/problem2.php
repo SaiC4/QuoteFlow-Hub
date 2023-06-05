@@ -8,6 +8,9 @@ function getTotal($arr) {
     $total = 0.00;
     //---------UCID: sjc65--------------
     //---------Date: 06/05/2023---------
+    //Explanation: As the code iterates over each value in the array sets,
+    //each value is added to the sum total and then rounded to the nearest
+    //hundredths place and then printed.
     //TODO do adding here
     $nums = count($arr);
     $totalNums = 0;

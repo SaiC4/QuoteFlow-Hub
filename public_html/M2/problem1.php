@@ -10,6 +10,10 @@ function processArray($arr) {
     //TODO add logic here to echo out only odd values
     //---------UCID: sjc65--------------
     //---------Date: 06/05/2023---------
+    //Explanation: As the code iterates over every value in the array sets,
+    //it checks to see if each value, when divided by 2, yields a remainder.
+    //If it does, then the value is added to an arrayand once the iteration is complete,
+    //the odd values array is printed.
     $nums = count($arr);
     $odd = array();
     $x = 0;
