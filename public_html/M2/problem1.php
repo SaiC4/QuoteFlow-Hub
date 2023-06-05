@@ -8,7 +8,19 @@ function processArray($arr) {
     echo "<br>Odds output:<br>";
     //note: use the $arr variable to iterate over, don't directly touch $a1-$a4
     //TODO add logic here to echo out only odd values
+    //---------UCID: sjc65--------------
+    //---------Date: 06/05/2023---------
+    $nums = count($arr);
+    $odd = array();
+    $x = 0;
 
+    for ($i = 0; $i < $nums; $i++) {
+        if ($arr[$i] % 2 != 0) {
+            $odd[$x] = $arr[$i];
+            $x++;
+        }
+    }
+    var_export($odd);
 }
 echo "Problem 1: Odd Output<br>";
 ?>
