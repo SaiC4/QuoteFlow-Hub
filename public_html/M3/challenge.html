@@ -8,21 +8,78 @@
         window.addEventListener("load", () => {
             console.log("loaded via javascript");
             //TODO: add any extra onload processing you may need here
+            
+            /*
+                ---------UCID: sjc65--------------
+                ---------Date: 06/12/2023---------
+            */
+            const navLinks = document.querySelectorAll("nav li a");
+            
+            navLinks.forEach((textLink) => {   
+                textLink.addEventListener("click", () => {
+                    const linkText = textLink.innerText;
+                    const capitalText = linkText.charAt(0).toUpperCase() + linkText.slice(1).toLowerCase();
+                    
+                    document.title = capitalText;
+                    document.querySelector("h1").textContent = capitalText;
+                });
+            });
         });
+        
         function getCurrentSelection() {
             setTimeout(() => {
+                console.log(event, event.srcElement.innerText);
                 //added this delay here as some solutions may require it to update properly (i.e., click code may complete before the navigation changes)
                 //TODO: add code for processing the current selection 
-
+                
                 //Note: likely you'll want to call updateCurrentPage towards the end
+
             }, 100);
         }
     </script>
     <style>
         /* TODO: make edits here */
+        nav li {
+            display: inline-block;
+            list-style-type: none;
+            margin: 0;
+            padding: 9px; 
+        }
+
+        nav{
+            background-color:rgb(81, 81, 81);
+            color: rgb(208, 199, 199)
+            
+        }
+
+        nav li:hover {
+            background-color:rgb(30, 31, 31);
+        }
+
+        li a {
+            color: white;
+            text-decoration: none;  
+            text-transform: uppercase;
+            font-family: "Lucida Console", "Courier New", monospace;         
+        }
+
+        li {
+            border-right: 1px solid #bbb;
+        }
+
+        h3+ul li{
+            list-style-type: "✓";
+        }
+
+        h1, a{
+            text-transform: capitalize;
+        }
+
+        body{
+            background-color:rgb(76, 196, 220);
+        }
     </style>
     <!-- make the necessary edits above this line -->
-
 
     <!-- Do not edit anything below this line, doing so will lose points-->
     <script src="https://it202-spring-22.herokuapp.com/M3/problem1.js">
