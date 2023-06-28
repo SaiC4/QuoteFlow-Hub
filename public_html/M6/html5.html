@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>HTML5 Canvas Game Mod</title>
 </head>
+
 <body>
     <canvas id="canvas" width="600" height="400" tabindex="1"></canvas>
     <style>
@@ -18,7 +20,7 @@
 
         // Get a reference to the canvas DOM element
         var canvas = document.getElementById('canvas');
-        
+
         // Get the canvas drawing context
         var context = canvas.getContext('2d');
 
@@ -41,6 +43,12 @@
         var targetX = 0;
         var targetY = 0;
         var targetLength = 25;
+        //------------------------------------------------------------------------------------------------------------------
+        // Properties for the trap square
+        var trapX = 0;
+        var trapY = 0;
+        var trapLength = 25;
+        //------------------------------------------------------------------------------------------------------------------
 
         // Determine if number a is within the range b to c (exclusive)
         function isWithin(a, b, c) {
@@ -49,7 +57,7 @@
 
         // Countdown timer (in seconds)
         var countdown = 30;
-        
+
         // ID to track the setTimeout
         var id = null;
 
@@ -114,9 +122,21 @@
             canvas.removeEventListener('click', startGame);
             // Put the target at a random starting point
             moveTarget();
+            //------------------------------------------------------------------------------------------------------------------
+            // Put the trap at a random starting point
+            moveTrap();
+            //------------------------------------------------------------------------------------------------------------------
             // Kick off the draw loop
             draw();
         }
+        //------------------------------------------------------------------------------------------------------------------
+        // Calculates the distance between the player and the target
+        function calculateDistance() {
+            var dx = targetX - x;
+            var dy = targetY - y;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+        //------------------------------------------------------------------------------------------------------------------
 
         // Show the game over screen
         function endGame() {
@@ -129,12 +149,18 @@
             context.textAlign = 'center';
             context.fillText('Final Score: ' + score, canvas.width / 2, canvas.height / 2);
         }
-
         // Move the target square to a random position
         function moveTarget() {
             targetX = Math.round(Math.random() * canvas.width - targetLength);
-            targetY = Math.round(Math.random() * canvas.height - targetLength)
+            targetY = Math.round(Math.random() * canvas.height - targetLength);
         }
+        //------------------------------------------------------------------------------------------------------------------
+        // Move the trap square to a random position
+        function moveTrap() {
+            trapX = Math.floor(Math.random() * (canvas.width - trapLength));
+            trapY = Math.floor(Math.random() * (canvas.height - trapLength));
+        }
+        //------------------------------------------------------------------------------------------------------------------
 
         // Clear the canvas
         function erase() {
@@ -171,30 +197,94 @@
             if (x + sideLength > canvas.width) {
                 x = canvas.width - sideLength;
             }
-            // Collide with the target
-            if (isWithin(targetX, x, x + sideLength) || isWithin(targetX + targetLength, x, x + sideLength)) { // X
-                if (isWithin(targetY, y, y + sideLength) || isWithin(targetY + targetLength, y, y + sideLength)) { // Y
+            //------------------------------------------------------------------------------------------------------------------
+            // Updated target collision
+            if (
+                isWithin(targetX, x, x + sideLength) ||
+                isWithin(targetX + targetLength, x, x + sideLength)
+            ) {
+                if (
+                    isWithin(targetY, y, y + sideLength) ||
+                    isWithin(targetY + targetLength, y, y + sideLength)
+                ) {
                     // Respawn the target
                     moveTarget();
+                    
+                    // Respawn the trap
+                    moveTrap();
+                    
                     // Increase the score
                     score++;
                 }
             }
+            //------------------------------------------------------------------------------------------------------------------
+            /*
+                UCID: sjc65
+                Date: 06/27/2023
+                Explanation: When the trap is collided with by the player, the "countdown" variable is set to 0, which causes the "endGame()" function
+                to be called, ending the game. To collide with the trap, the trap's dimensions must be in range with the player's dimensions. Line 215
+                checks for X-axis collision, while Line 216 checks for Y-axis collision.
+            */
+            // Collide with the trap
+            if (isWithin(trapX, x, x + sideLength) || isWithin(trapX + trapLength, x, x + sideLength)) {
+                if (isWithin(trapY, y, y + sideLength) || isWithin(trapY + trapLength, y, y + sideLength)) {
+                    // Sets Countdown to zero, causing game to end
+                    countdown = 0;
+                }
+            }
+
+            //------------------------------------------------------------------------------------------------------------------
+            /*
+                UCID: sjc65
+                Date: 06/27/2023
+                Explanation: The code updates the target sprite to move away from the player when the player approaches within the trigger radius of the target.
+                The code checks if the distance between the player and the target is less than 150 px. If it is, then the target begins to move away from the
+                player at about half the speed of the player. The code also prevents the target from moving off the canvas boundaries by making it collide with
+                the boundaries and prevent it from moving any more in the direction of the walls but allows movement in any other direction.
+            */
+            //calculate distance between player and target
+            var distance = calculateDistance();
+
+            //moves target away from player
+            if (distance < 150) {           // distance value (ex: 150) sets the trigger distance between player and target
+                var angle = Math.atan2(y - targetY, x - targetX);
+                targetX -= Math.cos(angle) * 1;
+                targetY -= Math.sin(angle) * 1;
+            }
+
+            // Prevents target from moving off the canvas
+            if (targetX < 0) {
+                targetX = 0;
+            } else if (targetX > canvas.width - 25) { // "... - 25" number value sets the border collision of the target on the x-axis
+                targetX = canvas.width - 25;
+            }
+            if (targetY < 0) {
+                targetY = 0;
+            } else if (targetY > canvas.height - 25) { // "... - 25" number value sets the border collision of the target on the y-axis
+                targetY = canvas.height - 25;
+            }
+            //------------------------------------------------------------------------------------------------------------------
             // Draw the square
             context.fillStyle = '#FF0000';
             context.fillRect(x, y, sideLength, sideLength);
-            
+
             // Draw the target 
             context.fillStyle = '#00FF00';
             context.fillRect(targetX, targetY, targetLength, targetLength);
-            
+
+            //-------------------------------------------------------------------------------------------------------------------
+            // Draw Trap
+            context.fillStyle = '#000000';
+            context.fillRect(trapX, trapY, trapLength, trapLength);
+            //-------------------------------------------------------------------------------------------------------------------
+
             // Draw the score and time remaining
             context.fillStyle = '#000000';
             context.font = '24px Arial';
             context.textAlign = 'left';
             context.fillText('Score: ' + score, 10, 24);
             context.fillText('Time Remaining: ' + countdown, 10, 50);
-            
+
             // End the game or keep playing
             if (countdown <= 0) {
                 endGame();
@@ -208,4 +298,5 @@
         canvas.focus();
     </script>
 </body>
+
 </html>
