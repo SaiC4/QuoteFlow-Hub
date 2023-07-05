@@ -33,9 +33,9 @@ if (isset($_POST["email"]) && isset($_POST["password"])) {
         $hasError = true;
     }
     //sanitize
-    $email = filter_var($email, FILTER_SANITIZE_EMAIL);
+    $email = sanitize_email($email);
     //validate
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    if (!is_valid_email($email)) {
         echo "Invalid email address";
         $hasError = true;
     }
@@ -61,7 +61,7 @@ if (isset($_POST["email"]) && isset($_POST["password"])) {
                     if (password_verify($password, $hash)) {
                         echo "Weclome $email";
                         $_SESSION["user"] = $user;
-                        die(header("Location: home.php"));  // Redirects user to homepage after successful login
+                        die(header("Location: home.php"));  // Redirects user to home page after successful login
                     } else {
                         echo "Invalid password";
                     }
