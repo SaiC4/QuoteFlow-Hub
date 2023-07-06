@@ -26,15 +26,16 @@ require_once(__DIR__ . "/../lib/functions.php");
 <!-- This is conditional HTML, it uses conditions that determine if something is displayed based on if-else statements-->
 <nav>
     <ul>
-        <?php if (is_logged_in()) : ?>      <!-- Checks if that function returns true or false. The ":" pauses for next line. -->
-            <li><a href="home.php">Home</a></li>    <!-- Displays if the condition is true -->
-        <?php endif; ?>     <!-- closes the if-statement -->
-        <?php if (!is_logged_in()) : ?>     <!-- checks if the function returns true or false. The ":" pauses for next line -->
-            <li><a href="login.php">Login</a></li>      <!-- displays the "login" and "register" links if user is not logged in -->
+        <?php if (is_logged_in()) : ?>  <!-- Checks if that function returns true or false. The ":" pauses for next line. -->
+            <li><a href="home.php">Home</a></li>  <!-- Displays if the condition is true -->
+            <li><a href="profile.php">Profile</a></li>  <!-- Displays if the condition is true -->
+        <?php endif; ?>  <!-- closes the if-statement -->
+        <?php if (!is_logged_in()) : ?>
+            <li><a href="login.php">Login</a></li>
             <li><a href="register.php">Register</a></li>
-        <?php endif; ?>     <!-- closes the if-statement -->
-        <?php if (is_logged_in()) : ?>      <!-- Checks if the function returns true -->
-            <li><a href="logout.php">Logout</a></li>    <!-- Displays if condition is true -->
-        <?php endif; ?>     <!-- closes the if-statement -->
+        <?php endif; ?>
+        <?php if (is_logged_in()) : ?>
+            <li><a href="logout.php">Logout</a></li>
+        <?php endif; ?>
     </ul>
 </nav>
