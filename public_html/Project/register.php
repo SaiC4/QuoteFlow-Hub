@@ -1,5 +1,6 @@
 <?php
 require(__DIR__ . "/../../partials/nav.php");
+reset_session();
 ?>
 <form onsubmit="return validate(this)" method="POST">
     <div>
@@ -8,7 +9,7 @@ require(__DIR__ . "/../../partials/nav.php");
     </div>
     <div>
         <label for="username">Username</label>
-        <input type="text" name="username" required maxlength="30" />
+        <input type="text" name="username" required maxlength="16" />
     </div>
     <div>
         <label for="pw">Password</label>
@@ -43,13 +44,14 @@ if (isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["confirm
     }
     //sanitize
     $email = sanitize_email($email);
+    
     //validate
     if (!is_valid_email($email)) {
         flash("Invalid email address", "danger");
         $hasError = true;
     }
-    if (!preg_match('/^[a-z0-9_-]{3,30}$/i', $username)) {
-        flash("Username must only contain lowercase letters, numbers, hyphen and/or underscores, and be between 3-30 characters", "danger");
+    if (!is_valid_username($username)) {
+        flash("Username must only contain 3-16 characters a-z, 0-9, _, or -", "danger");
         $hasError = true;
     }
     if (empty($password)) {
@@ -60,7 +62,7 @@ if (isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["confirm
         flash("Confirm password must not be empty", "danger");
         $hasError = true;
     }
-    if (strlen($password) < 8) {
+    if (!is_valid_password($password)) {
         flash("Password too short", "danger");
         $hasError = true;
     }
@@ -77,10 +79,9 @@ if (isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["confirm
         $stmt = $db->prepare("INSERT INTO Users (email, password, username) VALUES(:email, :password, :username)");
         try {
             $stmt->execute([":email" => $email, ":password" => $hash, ":username" => $username]);
-            flash("Successfully registered!");
-        } catch (Exception $e) {
-            flash("There was a problem registering", "danger");
-            flash("<pre>" . var_export($e, true) . "</pre>", "danger");
+            flash("Successfully registered!", "success");
+        } catch (PDOException $e) {
+            users_check_duplicate($e->errorInfo);
         }
     }
 }

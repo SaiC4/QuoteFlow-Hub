@@ -1,13 +1,23 @@
 <?php
 
-function sanitize_email($email = "") {      // This function sanitizes the email
-    
-    return filter_var(trim($email), FILTER_SANITIZE_EMAIL);     // "trim()" removes whitespace from user input
+function sanitize_email($email = "")    // This function sanitizes the email
+{
+    return filter_var(trim($email), FILTER_SANITIZE_EMAIL); // "trim()" removes whitespace from user input
 }
 
-function is_valid_email($email = "") {      // This function verifies if the email is valid, returns true or false
-    
-    return filter_var(trim($email), FILTER_VALIDATE_EMAIL);     // "trim()" removes whitespace from user input
+function is_valid_email($email = "")
+{
+    return filter_var(trim($email), FILTER_VALIDATE_EMAIL);
+}
+
+function is_valid_username($username)
+{
+    return preg_match('/^[a-z0-9_-]{3,16}$/', $username);
+}
+
+function is_valid_password($password)
+{
+    return strlen($password) >= 8;
 }
 
 /* 
