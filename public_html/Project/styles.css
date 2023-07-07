@@ -1,3 +1,15 @@
+/* ------------------------Alert messages styles------------------------ */
+.alert {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    font-family: "Lucida Console", "Courier New", monospace;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #fff;
+    font-weight: bold;
+}
+
 .alert-success {
     background-color: green
 }
@@ -13,11 +25,77 @@
 .alert-info {
     background-color: teal;
 }
-nav li{display: inline; background-color: rebeccapurple;}
-nav li a{color: hotpink}
-input{border-radius: 50%;}
-body{
-    background-color: hotpink;
-    color: rgb(153, 0, 153);
 
+/* ------------------------Main pages styles------------------------ */
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: rgb(81, 81, 81);
+    background-color:rgb(208, 199, 199);
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+nav {
+    background-color: rgb(81, 81, 81);
+    color: rgb(208, 199, 199);
+    padding: 10px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+nav ul {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+nav li {
+    display: inline-block;
+    margin: 0 3px;
+    padding: 9px;
+    border-right: 1px solid #bbb;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-family: "Lucida Console", "Courier New", monospace;
+    padding: 0 4px;
+}
+
+nav li:hover {
+    background-color: rgb(30, 31, 31);
+}
+
+form div {
+    margin-bottom: 10px;
+}
+
+input{
+    background-color: rgb(81, 81, 81);
+    color: rgb(208, 199, 199);
+    padding: 3px; /* Set 3px padding */
+}
+
+input:hover {
+    background-color: rgb(30, 31, 31);
+}
+
+body{
+    background-color:rgb(208, 199, 199);
+    color: rgb(0, 0, 0);
 }
