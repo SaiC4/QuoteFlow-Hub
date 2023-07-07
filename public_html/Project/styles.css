@@ -6,7 +6,7 @@
     font-family: "Lucida Console", "Courier New", monospace;
     font-size: 14px;
     line-height: 1.4;
-    color: #fff;
+    color: #ffffff;
     font-weight: bold;
 }
 
@@ -15,7 +15,7 @@
 }
 
 .alert-warning {
-    background-color: yellow;
+    background-color: rgb(204, 204, 1);
 }
 
 .alert-danger {
