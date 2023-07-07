@@ -25,6 +25,31 @@ reset_session();
     function validate(form) {
         //TODO 1: implement JavaScript validation
         //ensure it returns false for an error and true for success
+        let email = form.email.value.trim();
+        let username = form.username.value.trim();
+        let password = form.password.value.trim();
+        let pw = form.newPassword.value;
+        let con = form.confirmPassword.value;
+
+        if (!/^[a-z0-9_-]{3,16}$/.test(username)) {
+            flash("Invalid username format");
+            return false;
+        }
+        
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            flash("Invalid email format");
+            return false;
+        }
+        
+        if (password.length < 8) {
+            flash("Password must be at least 8 characters long");
+            return false;
+        }
+
+        if (pw !== con) {
+            flash("Password and Confrim password must match", "warning");
+            return false;
+        }
 
         return true;
     }
