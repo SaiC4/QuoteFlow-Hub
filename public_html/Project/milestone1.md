@@ -1,6 +1,6 @@
 <table><tr><td> <em>Assignment: </em> IT202 Milestone1 Deliverable</td></tr>
 <tr><td> <em>Student: </em> Sai Chandra (sjc65)</td></tr>
-<tr><td> <em>Generated: </em> 7/7/2023 10:45:41 PM</td></tr>
+<tr><td> <em>Generated: </em> 7/18/2023 1:55:14 PM</td></tr>
 <tr><td> <em>Grading Link: </em> <a rel="noreferrer noopener" href="https://learn.ethereallab.app/homework/IT202-450-M23/it202-milestone1-deliverable/grade/sjc65" target="_blank">Grading</a></td></tr></table>
 <table><tr><td> <em>Instructions: </em> <ol><li>Checkout Milestone1 branch</li><li>Create a milestone1.md file in your Project folder</li><li>Git add/commit/push this empty file to Milestone1 (you'll need the link later)</li><li>Fill in the deliverable items<ol><li>For each feature, add a direct link (or links) to the expected file the implements the feature from Heroku Prod (I.e,&nbsp;<a href="https://mt85-prod.herokuapp.com/Project/register.php">https://mt85-prod.herokuapp.com/Project/register.php</a>)</li></ol></li><li>Ensure your images display correctly in the sample markdown at the bottom</li><ol><li>NOTE: You may want to try to capture as much checklist evidence in your screenshots as possible, you do not need individual screenshots and are recommended to combine things when possible. Also, some screenshots may be reused if applicable.</li></ol><li>Save the submission items</li><li>Copy/paste the markdown from the "Copy markdown to clipboard link" or via the download button</li><li>Paste the code into the milestone1.md file or overwrite the file</li><li>Git add/commit/push the md file to Milestone1</li><li>Double check the images load when viewing the markdown file (points will be lost for invalid/non-loading images)</li><li>Make a pull request from Milestone1 to dev and merge it (resolve any conflicts)<ol><li>Make sure everything looks ok on heroku dev</li></ol></li><li>Make a pull request from dev to prod (resolve any conflicts)<ol><li>Make sure everything looks ok on heroku prod</li></ol></li><li>Submit the direct link from github prod branch to the milestone1.md file (no other links will be accepted and will result in 0)</li></ol></td></tr></table>
 <table><tr><td> <em>Deliverable 1: </em> Feature: User will be able to register a new account </td></tr><tr><td><em>Status: </em> <img width="100" height="20" src="https://user-images.githubusercontent.com/54863474/211707773-e6aef7cb-d5b2-4053-bbb1-b09fc609041e.png"></td></tr>
@@ -19,6 +19,9 @@
 </td></tr>
 <tr><td><img width="768px" src="https://firebasestorage.googleapis.com/v0/b/learn-e1de9.appspot.com/o/assignments%2Fsjc65%2F2023-07-07T19.46.58Register-valid%20form%20data.PNG.webp?alt=media&token=a123bb09-6c92-4582-ad44-f8ea1974152c"/></td></tr>
 <tr><td> <em>Caption:</em> <p>Form filled with valid data<br></p>
+</td></tr>
+<tr><td><img width="768px" src="https://firebasestorage.googleapis.com/v0/b/learn-e1de9.appspot.com/o/assignments%2Fsjc65%2F2023-07-18T17.53.45Register-invalid%20password%20match.PNG.webp?alt=media&token=8f71a240-9997-4438-881f-b93905190fe8"/></td></tr>
+<tr><td> <em>Caption:</em> <p>Invalid password match validation<br></p>
 </td></tr>
 </table></td></tr>
 <tr><td> <em>Sub-Task 2: </em> Add a screenshot of the Users table with data in it</td></tr>
@@ -145,7 +148,7 @@
 <tr><td> <em>Caption:</em> <p>username was changed to tester2<br></p>
 </td></tr>
 <tr><td><img width="768px" src="https://firebasestorage.googleapis.com/v0/b/learn-e1de9.appspot.com/o/assignments%2Fsjc65%2F2023-07-08T00.17.05valid-email%20update.PNG.webp?alt=media&token=1a92cbdf-4713-47d0-96e8-22909a26d8f5"/></td></tr>
-<tr><td> <em>Caption:</em> <p>email was changed to <a href="mailto:&#116;&#101;&#115;&#x74;&#x65;&#x72;&#x32;&#x40;&#x74;&#101;&#115;&#116;&#46;&#99;&#x6f;&#x6d;">&#116;&#101;&#115;&#x74;&#x65;&#x72;&#x32;&#x40;&#x74;&#101;&#115;&#116;&#46;&#99;&#x6f;&#x6d;</a><br></p>
+<tr><td> <em>Caption:</em> <p>email was changed to <a href="mailto:&#x74;&#101;&#115;&#x74;&#101;&#114;&#50;&#x40;&#x74;&#101;&#x73;&#x74;&#46;&#99;&#x6f;&#x6d;">&#x74;&#101;&#115;&#x74;&#101;&#114;&#50;&#x40;&#x74;&#101;&#x73;&#x74;&#46;&#99;&#x6f;&#x6d;</a><br></p>
 </td></tr>
 <tr><td><img width="768px" src="https://firebasestorage.googleapis.com/v0/b/learn-e1de9.appspot.com/o/assignments%2Fsjc65%2F2023-07-08T00.17.10valid-password%20update.PNG.webp?alt=media&token=785269ca-b9cb-4d16-8e91-af48bd896dad"/></td></tr>
 <tr><td> <em>Caption:</em> <p>password was changed<br></p>
