@@ -26,4 +26,7 @@ require(__DIR__ . "/reset_session.php");
 
 //get URL of destination path
 require(__DIR__ . "/get_url.php");
+
+//get API helper for API keys
+require_once(__DIR__ . "/api_helper.php");   //Added by me, the student.
 ?>
