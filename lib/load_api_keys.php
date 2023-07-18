@@ -1,5 +1,5 @@
 <?php 
-$env_keys = ["API_KEY"];    //To test "cats.php" type in "CAT_API_KEY" (the variable is in quotation marks)
+$env_keys = ["CAT_API_KEY"];    //To test your API key, type in "API_KEY" (the variable is in quotation marks)
 $ini = @parse_ini_file(".env");
 
 $API_KEYS = [];
