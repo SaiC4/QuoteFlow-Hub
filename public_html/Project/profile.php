@@ -2,8 +2,47 @@
 require_once(__DIR__ . "/../../partials/nav.php");
 is_logged_in(true);
 ?>
+
 <?php
-if (isset($_POST["save"])) {
+// Function to fetch API data and upload to Quotes table
+function generateAPIQuote()
+{
+    $url = "https://andruxnet-random-famous-quotes.p.rapidapi.com/"; // Replace with the actual API endpoint URL
+    $key = "API_KEY";
+    try {
+        // Send a GET request to the API endpoint
+        $response = get($url, $key, ["cat" => "famous", "count" => 1], true, "andruxnet-random-famous-quotes.p.rapidapi.com");
+
+        // Parse the API response JSON data
+        $apiData = json_decode($response["response"], true);
+
+        // Check if the API response contains the required data (quote and author)
+        if (isset($apiData[0]["quote"]) && isset($apiData[0]["author"])) {
+            $quote = $apiData[0]["quote"];
+            $author = $apiData[0]["author"];
+
+            // Insert the API data into the Quotes table with API_gen set to true
+            $db = getDB();
+            $stmt = $db->prepare("INSERT INTO Quotes (quotes, author, API_Gen) VALUES (:quote, :author, 1)");
+            $stmt->execute([
+                ":quote" => $quote,
+                ":author" => $author
+            ]);
+            flash("API data added successfully", "success");
+        } else {
+            flash("API response format is invalid", "danger");
+        }
+    } catch (Exception $e) {
+        flash("Error fetching data from API", "danger");
+    }
+}
+?>
+
+
+<?php
+if (isset($_POST["generateAPIQuote"])) {
+    generateAPIQuote(); // Call the function to retrieve API data and upload it to the database
+} else if (isset($_POST["save"])) {
     $email = se($_POST, "email", null, false);
     $username = se($_POST, "username", null, false);
     $hasError = false;
@@ -45,8 +84,43 @@ if (isset($_POST["save"])) {
             //echo "<pre>" . var_export($e->errorInfo, true) . "</pre>";
         }
     }
+//-------------------------------------------------------
 
+ // Additional code for inserting quote and author into the Quotes table
+ $quote = se($_POST, "quote", null, false);
+ $author = se($_POST, "author", null, false);
 
+if(empty($quote) || empty($author)) {
+    flash("Quote or Author fields cannot be empty");
+} else if(!empty($author) && strlen($quote) < 3) {
+    flash("Quote field must contain at least 3 characters");
+} else if (!empty($quote) && !empty($author) && strlen($quote) > 2) {
+    // Insert the quote and author into the Quotes table
+    $db = getDB();
+    $stmt = $db->prepare("SELECT id, quotes, author FROM Quotes WHERE quotes = :quote AND author = :author");
+    $stmt->execute([
+        ":quote" => $quote,
+        ":author" => $author
+    ]);
+    $existingQuote = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($existingQuote) {
+        // Alert the user about the duplicate quote
+        flash("This quote already exists in the database", "warning");
+    } else {
+        $stmt = $db->prepare("INSERT INTO Quotes (quotes, author) VALUES (:quote, :author)");
+        try {
+            $stmt->execute([
+                ":quote" => $quote,
+                ":author" => $author,
+            ]);
+            flash("Quote added successfully", "success");
+        } catch (PDOException $e) {
+            flash("An error occurred while adding the quote", "danger");
+        }
+    }
+}
+//-------------------------------------------------------
     //check/update password
     $current_password = se($_POST, "currentPassword", null, false);
     $new_password = se($_POST, "newPassword", null, false);
@@ -116,6 +190,17 @@ $username = get_username();
         <label for="conp">Confirm Password</label>
         <input type="password" name="confirmPassword" id="conp" />
     </div>
+<!-- fields for quote and author -->
+<div class="mb-3">
+        <label for="quote">Quote</label>
+        <input type="text" name="quote" id="quote"/>
+    </div>
+    <div class="mb-3">
+        <label for="author">Author</label>
+        <input type="text" name="author" id="author" />
+    </div>
+    <!-- <input type="hidden" name="generateAPIQuote" value="1" /> -->
+    <input type="submit" value = "API Gen" name="generateAPIQuote" />
     <input type="submit" value="Update Profile" name="save" />
 </form>
 
@@ -128,6 +213,8 @@ $username = get_username();
         let email = form.email.value.trim();
         let username = form.username.value.trim();
         let password = form.password.value.trim();
+        let quote = form.quote.value.trim();
+        let author = form.author.value.trim();
 
         if (!/^[a-z0-9_-]{3,16}$/.test(username)) {
             flash("Invalid username format");
@@ -141,6 +228,16 @@ $username = get_username();
         
         if (password.length < 8) {
             flash("Password must be at least 8 characters long");
+            isValid = false;
+        }
+
+        if (quote.length < 3) {
+            flash("Quote must be at least 3 characters long", "danger");
+            isValid = false;
+        }
+
+        if (quote.length > 3 && author === "") {
+            flash("Author field cannot be empty", "danger");
             isValid = false;
         }
 
