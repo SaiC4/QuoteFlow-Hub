@@ -92,7 +92,7 @@ if (isset($_GET['quoteSearch']) || isset($_GET['authorSearch']) || isset($_GET['
         .table-container {
             width: 1600px;
             /* Set the width to 150 pixels */
-            height: 500px;
+            height: 400px;
             /* Set the height to 100 pixels */
             overflow-y: scroll;
             /* Add vertical scrollbar */
