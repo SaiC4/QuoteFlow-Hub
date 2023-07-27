@@ -11,6 +11,18 @@ if (!has_role("Admin")) {
 if (isset($_GET['quote_id'])) {
     $quoteId = (int)$_GET['quote_id'];
 
+    // Get the total number of records in the database
+    $db = getDB();
+    $stmt = $db->query("SELECT COUNT(*) AS total_records FROM Quotes");
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $totalRecords = (int)$result['total_records'];
+
+    if ($quoteId > $totalRecords) {
+        flash("Invalid quote ID", "warning");
+        header("Location: " . get_url("data_list.php"));
+        exit;
+    }
+
     // Function to retrieve record details based on the ID
     function getRecordDetails($id)
     {
@@ -42,7 +54,7 @@ if (isset($_GET['quote_id'])) {
         exit;
     }
 } else {
-    flash("Record ID not found", "warning");
+    flash("record ID not found", "warning");
     // Redirect to the quotes list page if the quote ID is not provided
     header("Location: " . get_url("data_list.php"));
     exit;
@@ -54,9 +66,13 @@ if (isset($_POST['update'])) {
     $newAuthor = trim($_POST['author']);
 
     // Validate the input fields
-    if (empty($newQuote) || empty($newAuthor)) {
-        flash("Quote and Author fields cannot be empty", "danger");
-    } else {
+   // Validate the input fields
+   $formErrors = validateForm($newQuote, $newAuthor);
+   if (!empty($formErrors)) {
+       foreach ($formErrors as $error) {
+           flash($error, "warning");
+       }
+   } else {
         $db = getDB();
         $stmt = $db->prepare("UPDATE Quotes SET quotes = :quote, author = :author WHERE id = :id");
         try {
@@ -65,23 +81,54 @@ if (isset($_POST['update'])) {
                 ":author" => $newAuthor,
                 ":id" => $quoteId
             ]);
-            flash("Record successfully updated", "success");
+            // Redirects user back to edit page on successful update and flashes success message
+            flash("Quote and Author successfully updated", "success");
+            header("Location: " . $_SERVER['PHP_SELF'] . "?quote_id=" . $quoteId);
+            exit;
         } catch (PDOException $e) {
-            flash("An error occurred while updating the quote", "warning");
+            flash("An error occurred while updating the record", "danger");
         }
     }
 }
+
+function validateForm($quote, $author)
+{
+    $errors = [];
+
+    // Checks if quote length is between 4 and 50 characters
+    if (strlen($quote) > 0 && (strlen($quote) <= 3 || strlen($quote) > 255)) {
+        $errors[] = "Quote must be between 4 and 255 characters";
+    }
+
+    // Checks if author length is between 4 and 50 characters
+    if (strlen($author) > 0 && (strlen($author) <= 3 || strlen($author) > 50)) {
+        $errors[] = "Author must be between 4 and 50 characters";
+    }
+
+    // Checks if the author field contains numbers
+    if (strlen($author) > 0 && preg_match('/\d/', $author)) {
+        $errors[] = "Author field must not contain numbers";
+    }
+
+    // Checks if quote field and/or author field is empty
+    if ((empty($quote) || empty($author)) || (empty($quote) && empty($author))) {
+        $errors[] = "Quote and/or Author fields must not be empty";
+    }
+
+    return $errors;
+}
+
 ?>
 
 <!DOCTYPE html>
 <html>
 
 <head>
-    <title>Edit Quote</title>
+    <title>Edit Details</title>
 </head>
 
 <body>
-    <h2>Edit Quote</h2>
+    <h2>Edit Record Details</h2>
     <form method="POST">
         <div>
             <label for="quote">Quote:</label>
