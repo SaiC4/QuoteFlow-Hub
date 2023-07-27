@@ -4,6 +4,12 @@ is_logged_in(true);
 ?>
 
 <?php
+/*
+    UCID: sjc65
+    Date: 07/26/2023
+    Explanation: In this picture, it shows the function for retrieving data from the database and displaying it into the list,
+    the code also has the search functionality so it can compare the user's filter keywords with what contains in the database.
+*/
 // Function to retrieve data from the Quotes table
 function getQuotesData($quoteSearchTerm = null, $authorSearchTerm = null, $limit = 10)
 {
@@ -50,7 +56,14 @@ function getQuotesData($quoteSearchTerm = null, $authorSearchTerm = null, $limit
         return [];
     }
 }
-
+/*
+    UCID: sjc65
+    Date: 07/26/2023
+    Explanation: This is the code block that handles the form submission for the Search bar fields. The code first gets the user
+    input from the text fields and compares it with the data in the database to see how many of the records contain the
+    specified keywords and then the records that match are the only ones displayed. If no matches are found, the code
+    prompts the user with an alert message.
+*/
 // Handle the form submission
 if (isset($_GET['quoteSearch']) || isset($_GET['authorSearch']) || isset($_GET['limit'])) {
     
@@ -93,7 +106,14 @@ if (isset($_GET['quoteSearch']) || isset($_GET['authorSearch']) || isset($_GET['
     <h2>Quotes List</h2>
     
     <form method="get" action="">
-        
+<!-- 
+    UCID: sjc65
+    Date: 07/26/2023
+    Explanation: In this HTML code, it shows how the search bars are displayed. Each search bar is seperated by a div class
+    object called "seperator" which seperates the bars with a thin, vertical black line. The part of the code that may particularly
+    be of interest is the "<input type="number...". This is the code that prevents the user from filtering records higher than the
+    total number of records in the list.
+-->
         <div class="search-bars">
             <label for="quoteSearch">Quote Search:</label>
             <input type="text" name="quoteSearch" id="quoteSearch" placeholder="Enter search term">
@@ -106,7 +126,8 @@ if (isset($_GET['quoteSearch']) || isset($_GET['authorSearch']) || isset($_GET['
             <div class="separator"></div> <!-- Vertical black line separator -->
             
             <label for="limit">Records Limit (1-100):</label>
-            <input type="number" name="limit" id="limit" min="1" max="<?php echo $totalRecords; ?>" value="<?php echo isset($limit) ? $limit : $defaultLimit; ?>">
+            <input type="number" name="limit" id="limit" min="1" max="<?php echo $totalRecords; ?>" 
+                                      value="<?php echo isset($limit) ? $limit : $defaultLimit; ?>">
         </div>
 
         <div class="buttons-container">
