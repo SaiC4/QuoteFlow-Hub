@@ -163,7 +163,13 @@ if (isset($_GET['quoteSearch']) || isset($_GET['authorSearch']) || isset($_GET['
                     </td>
                     <td><?php echo htmlspecialchars($quoteData['quotes']); ?></td>
                     <td><?php echo htmlspecialchars($quoteData['author']); ?></td>
-                    
+                <!--
+                    UCID: sjc65
+                    Date: 07/27/2023
+                    Explanation: Each button is tied to a link that redirects the user to the button's associated link, such as 
+                    details button to the details page. Each link is appended with the ID of the quote that is associated with
+                    the record in the data list.
+                -->
                     <!-- Button link to Data Details Page -->
                     <td>
                         <a href="view_details.php?quote_id=<?php echo $quoteData['id']; ?>">

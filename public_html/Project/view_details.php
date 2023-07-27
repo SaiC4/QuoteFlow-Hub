@@ -2,6 +2,12 @@
 require(__DIR__ . "/../../partials/nav.php");
 ?>
 <?php
+/*
+    UCID: sjc65
+    Date: 07/27/2023
+    Explanation: This block of code is what retrieves the data from the database and displays the information in a list based on 
+    the ID of the record. (The ID of the record is determined by the page redirection logic of the HTML code in data_list.php).
+*/
 // Function to retrieve record details based on the ID
 function getRecordDetails($id)
 {
@@ -20,9 +26,31 @@ function getRecordDetails($id)
     }
 }
 
+/*
+    UCID: sjc65
+    Date: 07/27/2023
+    Explanation: In the block of code, if a quote ID is not retrieved, the code redirects them back to the data list page and alerts
+    them of the issue. If a record is not found, the code redirects them back to the data list and alerts them that the record was
+    not found. If the ID number exceeds the number of records in the database, the user is redirected back to the data list page
+    and alerted that the record was not found.
+*/
 // Check if the quote ID is provided in the URL
 if (isset($_GET['quote_id'])) {
     $quoteId = (int)$_GET['quote_id'];
+
+    // Get the total number of records in the database
+    $db = getDB();
+    $stmt = $db->prepare("SELECT COUNT(*) AS total FROM Quotes");
+    $stmt->execute();
+    $totalRecords = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+    // Check if the provided ID exceeds the total number of records
+    if ($quoteId < 1 || $quoteId > $totalRecords) {
+        flash("Record not found", "danger");
+        // Redirect to the quotes list page if the record is not found
+        header("Location: data_list.php");
+        exit;
+    }
 
     // Get the record details based on the quote ID
     $recordDetails = getRecordDetails($quoteId);
@@ -40,6 +68,7 @@ if (isset($_GET['quote_id'])) {
         exit;
     }
 } else {
+    flash("Record ID not found", "warning");
     // Redirect to the quotes list page if the quote ID is not provided
     header("Location: data_list.php");
     exit;
