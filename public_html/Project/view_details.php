@@ -56,16 +56,42 @@ if (isset($_GET['quote_id'])) {
 <body>
     <h2>Record Details</h2>
 
-    <div>
-        <p><strong>Quote ID:</strong> <?php echo $quoteId; ?></p>
-        <p><strong>Quote:</strong> <?php echo htmlspecialchars($quote); ?></p>
-        <p><strong>Author:</strong> <?php echo htmlspecialchars($author); ?></p>
-        <p><strong>API?:</strong> <?php echo ($apiGen === 1) ? 'Yes' : 'No'; ?></p>
-        <p><strong>Created:</strong> <?php echo $created; ?></p>
-        <p><strong>Modified:</strong> <?php echo $modified; ?></p>
-    </div>
+    <?php if ($recordDetails !== null) : ?>
+        <div class="details-box">
+            <div class="details-row">
+                <span class="details-label">Quote ID:</span>
+                <span class="details-value"><?php echo $quoteId; ?></span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Quote:</span>
+                <span class="details-value"><?php echo htmlspecialchars($quote); ?></span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Author:</span>
+                <span class="details-value"><?php echo htmlspecialchars($author); ?></span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">API?:</span>
+                <span class="details-value"><?php echo ($apiGen === 1) ? 'Yes' : 'No'; ?></span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Created:</span>
+                <span class="details-value"><?php echo $created; ?></span>
+            </div>
+            <div class="details-row-modified">
+                <span class="details-label">Modified:</span>
+                <span class="details-value"><?php echo $modified; ?></span>
+            </div>
+        </div>
+        <!-- Button to go back to the Quotes list -->
+        <a href="data_list.php"><button>Back to Quotes List</button></a>
 
-    <a href="data_list.php">Back to Quotes List</a>
+        <!-- Button to go to record edit page -->
+        <a href="admin/edit_details.php?quote_id=<?php echo $quoteId; ?>"><button>Edit</button></a>
+
+        <!-- Button to go to record delete page -->
+        <a href="admin/delete_details.php?quote_id=<?php echo $quoteId; ?>"><button>Delete</button></a>
+    <?php endif; ?>
 </body>
 
 </html>
