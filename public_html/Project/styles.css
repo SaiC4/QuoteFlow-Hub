@@ -104,7 +104,7 @@ body {
 /* ----------------------------------------------------data_list.php Styles---------------------------------------------------- */
 /* CSS styling for the table container */
 .table-container {
-    width: 1600px;
+    width: 1400px;
     height: 400px;
     overflow-y: scroll;     /* Add vertical scrollbar */
     border: 2px solid black;
