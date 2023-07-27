@@ -125,22 +125,93 @@ function validateForm($quote, $author)
 
 <head>
     <title>Edit Details</title>
+    <style>
+/* -----------------------------------------------------CSS Styles------------------------------------------------------------------*/
+/* CSS for the black double border around the form */
+.form-container {
+    border: 6px double black;
+    padding: 20px; 
+}
+
+/* CSS to space out the labels and inputs */
+form div {
+    margin-bottom: 10px;
+}
+
+/* CSS to extend the height of the Quote label */
+form label[for="quote"] {
+    vertical-align: top; 
+    display: inline-block;
+}
+
+/* CSS for the box around the Quote label */
+.author-label-box, .quote-label-box {
+    color: black;
+    padding: 5px;
+    display: inline-block;
+    font-weight: bold;
+}
+
+/* CSS to make the input fields bigger and align them with labels */
+form input[type="text"] {
+    width: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+input[type="submit"][name="update"] {
+    background-color: rgb(81, 81, 81);
+    color: rgb(208, 199, 199);
+    margin-top: 10px;
+    margin: 10px 10px 0 0;
+    padding: 8px;
+}
+
+/* CSS to change the hover color of the submit input button */
+input[type="submit"][name="update"]:hover {
+    background-color: rgb(30, 31, 31);
+}
+
+/* CSS to change the two button design */
+button {
+    background-color: rgb(81, 81, 81);
+    color: rgb(208, 199, 199);
+    margin-top: 10px;
+    margin: 10px 10px 0 0;
+    padding: 8px;
+}
+
+/* CSS to change the two button hover colors */
+button:hover {
+    background-color: rgb(30, 31, 31);
+}
+/* ---------------------------------------------------------------------------------------------------------------------------------*/
+    </style>
 </head>
 
 <body>
-    <h2>Edit Record Details</h2>
-    <form method="POST">
-        <div>
-            <label for="quote">Quote:</label>
-            <input type="text" name="quote" id="quote" value="<?php echo htmlspecialchars($quote); ?>" />
-        </div>
-        <div>
-            <label for="author">Author:</label>
-            <input type="text" name="author" id="author" value="<?php echo htmlspecialchars($author); ?>" />
-        </div>
-        <input type="submit" name="update" value="Update" />
-    </form>
-    <a href="<?php echo get_url("data_list.php"); ?>">Back to Quotes List</a>
+    <div class="form-container">
+        <h2>Edit Record Details</h2>
+        <form method="POST">
+            <div>
+                <div class="quote-label-box">
+                    <label for="quote">Quote:</label>
+                </div>
+                <input type="text" name="quote" id="quote" value="<?php echo htmlspecialchars($quote); ?>" />
+            </div>
+            <div>
+                <div class="author-label-box">
+                    <label for="author">Author:</label>
+                </div>
+                <input type="text" name="author" id="author" value="<?php echo htmlspecialchars($author); ?>" />
+            </div>
+            <input type="submit" name="update" value="Update" />
+        </form>
+    </div>
+    <!-- Redirects user back to data_list.php   ***ISSUE HERE***-->
+    <!--<a href="../Project/data_list.php"><button>Back to Quotes List</button></a>-->
+    <!-- Redirects user back to view_details.php -->
+    <a href="<?php echo get_url("view_details.php?quote_id=" . $quoteId); ?>"><button>Back to Details</button></a>
 </body>
 
 </html>
