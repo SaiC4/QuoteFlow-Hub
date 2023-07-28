@@ -6,7 +6,13 @@ if (!has_role("Admin")) {
     flash("You don't have permission to view this page", "warning");
     die(header("Location: " . get_url("data_list.php")));
 }
-
+/*
+    UCID: sjc65
+    Date: 07/27/2023
+    Explanation: This block of code handles the details retrieval from the record ID. The code retrieves the ID from the URL, 
+    retrieves the number of records in the database for record ID validation, and fetches the quote details from the database
+    based on the record ID.
+*/
 // Check if the quote ID is provided in the URL
 if (!isset($_GET['quote_id']) || !ctype_digit($_GET['quote_id'])) {
     // Invalid or missing quote_id in the URL
@@ -43,7 +49,14 @@ if (!$quoteData) {
     header("Location: " . get_url("data_list.php"));
     exit();
 }
-
+/*
+    UCID: sjc65
+    Date: 07/27/2023
+    Explanation: This code block handles the deletion process, it performs the deletion using SQL statements and then after that
+    is executed, it redirects the user back to the data_list.php page and prompts them with a success alert. If for some reason the
+    deletion does not succeed, the user is prompted with a message stating that an error occurred preventing the record from
+    being deleted.
+*/
 // Handle the deletion process
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
@@ -69,7 +82,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <title>Delete Record Details</title>
 </head>
-
+<!--
+    UCID: sjc65
+    Date: 07/27/2023
+    Explanation: This block of code shows the HTML form for the deletion process. The main deletion process is triggered by the
+    "Confirm Delete" button but the information above it simply display all the details of the current record.
+-->
 <body>
     <h2>Delete Quote Record?</h2>
 
