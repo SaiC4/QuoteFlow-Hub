@@ -7,6 +7,13 @@ if (!has_role("Admin")) {
 }
 ?>
 <?php
+/*
+    UCID: sjc65
+    Date: 07/27/2023
+    Explanation: In this block of code, it shows how the quote ID is retrieved from the URL upon page redirection, then the quote
+    and author data is retrieved. The code also shows how the total number of records is retrieved from the database. This is 
+    a form of validation to prevent the user from typing in an ID greater than the number of records in the database.
+*/
 // Check if the quote ID is provided in the URL
 if (isset($_GET['quote_id'])) {
     $quoteId = (int)$_GET['quote_id'];
@@ -59,20 +66,19 @@ if (isset($_GET['quote_id'])) {
     header("Location: " . get_url("data_list.php"));
     exit;
 }
-
 // Handle the form submission
 if (isset($_POST['update'])) {
     $newQuote = trim($_POST['quote']);
     $newAuthor = trim($_POST['author']);
 
     // Validate the input fields
-   // Validate the input fields
-   $formErrors = validateForm($newQuote, $newAuthor);
-   if (!empty($formErrors)) {
-       foreach ($formErrors as $error) {
-           flash($error, "warning");
-       }
-   } else {
+    // Validate the input fields
+    $formErrors = validateForm($newQuote, $newAuthor);
+    if (!empty($formErrors)) {
+        foreach ($formErrors as $error) {
+            flash($error, "warning");
+        }
+    } else {
         $db = getDB();
         $stmt = $db->prepare("UPDATE Quotes SET quotes = :quote, author = :author WHERE id = :id");
         try {
@@ -91,6 +97,12 @@ if (isset($_POST['update'])) {
     }
 }
 
+/*
+    UCID: sjc65
+    Date: 07/27/2023
+    Explanation: This code block handles the form validation, it checks the quote and author length ranges; if the author field
+    contains numbers; and if the author and/or quote field are empty. 
+*/
 function validateForm($quote, $author)
 {
     $errors = [];
@@ -126,68 +138,77 @@ function validateForm($quote, $author)
 <head>
     <title>Edit Details</title>
     <style>
-/* -----------------------------------------------------CSS Styles------------------------------------------------------------------*/
-/* CSS for the black double border around the form */
-.form-container {
-    border: 6px double black;
-    padding: 20px; 
-}
+        /* -----------------------------------------------------CSS Styles------------------------------------------------------------------*/
+        /* CSS for the black double border around the form */
+        .form-container {
+            border: 6px double black;
+            padding: 20px;
+        }
 
-/* CSS to space out the labels and inputs */
-form div {
-    margin-bottom: 10px;
-}
+        /* CSS to space out the labels and inputs */
+        form div {
+            margin-bottom: 10px;
+        }
 
-/* CSS to extend the height of the Quote label */
-form label[for="quote"] {
-    vertical-align: top; 
-    display: inline-block;
-}
+        /* CSS to extend the height of the Quote label */
+        form label[for="quote"] {
+            vertical-align: top;
+            display: inline-block;
+        }
 
-/* CSS for the box around the Quote label */
-.author-label-box, .quote-label-box {
-    color: black;
-    padding: 5px;
-    display: inline-block;
-    font-weight: bold;
-}
+        /* CSS for the box around the Quote label */
+        .author-label-box,
+        .quote-label-box {
+            color: black;
+            padding: 5px;
+            display: inline-block;
+            font-weight: bold;
+        }
 
-/* CSS to make the input fields bigger and align them with labels */
-form input[type="text"] {
-    width: 100%;
-    padding: 5px;
-    box-sizing: border-box;
-}
+        /* CSS to make the input fields bigger and align them with labels */
+        form input[type="text"] {
+            width: 100%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
 
-input[type="submit"][name="update"] {
-    background-color: rgb(81, 81, 81);
-    color: rgb(208, 199, 199);
-    margin-top: 10px;
-    margin: 10px 10px 0 0;
-    padding: 8px;
-}
+        input[type="submit"][name="update"] {
+            background-color: rgb(81, 81, 81);
+            color: rgb(208, 199, 199);
+            margin-top: 10px;
+            margin: 10px 10px 0 0;
+            padding: 8px;
+        }
 
-/* CSS to change the hover color of the submit input button */
-input[type="submit"][name="update"]:hover {
-    background-color: rgb(30, 31, 31);
-}
+        /* CSS to change the hover color of the submit input button */
+        input[type="submit"][name="update"]:hover {
+            background-color: rgb(30, 31, 31);
+        }
 
-/* CSS to change the two button design */
-button {
-    background-color: rgb(81, 81, 81);
-    color: rgb(208, 199, 199);
-    margin-top: 10px;
-    margin: 10px 10px 0 0;
-    padding: 8px;
-}
+        /* CSS to change the two button design */
+        button {
+            background-color: rgb(81, 81, 81);
+            color: rgb(208, 199, 199);
+            margin-top: 10px;
+            margin: 10px 10px 0 0;
+            padding: 8px;
+        }
 
-/* CSS to change the two button hover colors */
-button:hover {
-    background-color: rgb(30, 31, 31);
-}
-/* ---------------------------------------------------------------------------------------------------------------------------------*/
+        /* CSS to change the two button hover colors */
+        button:hover {
+            background-color: rgb(30, 31, 31);
+        }
+
+        /* ---------------------------------------------------------------------------------------------------------------------------------*/
     </style>
 </head>
+<!--
+    UCID: sjc65
+    Date: 07/27/2023
+    Explanation: This block of code shows the HTML design of the page. The value of the input elements are assigned with the php 
+    variable, $quote, translated to html. All the way at the bottom, above "</body>", is a button link to redirect the user back 
+    to the details page of the specified ID number to ensure the details and edit details pages are synced.
+-->
 
 <body>
     <div class="form-container">
@@ -210,6 +231,7 @@ button:hover {
     </div>
     <!-- Redirects user back to data_list.php   ***ISSUE HERE***-->
     <!--<a href="../Project/data_list.php"><button>Back to Quotes List</button></a>-->
+
     <!-- Redirects user back to view_details.php -->
     <a href="<?php echo get_url("view_details.php?quote_id=" . $quoteId); ?>"><button>Back to Details</button></a>
 </body>
