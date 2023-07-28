@@ -229,8 +229,8 @@ function validateForm($quote, $author)
             <input type="submit" name="update" value="Update" />
         </form>
     </div>
-    <!-- Redirects user back to data_list.php   ***ISSUE HERE***-->
-    <!--<a href="../Project/data_list.php"><button>Back to Quotes List</button></a>-->
+    <!-- Redirects user back to data_list.php -->
+    <a href="<?php echo get_url('data_list.php'); ?>"><button type="button">Back to Quotes List</button></a>
 
     <!-- Redirects user back to view_details.php -->
     <a href="<?php echo get_url("view_details.php?quote_id=" . $quoteId); ?>"><button>Back to Details</button></a>
