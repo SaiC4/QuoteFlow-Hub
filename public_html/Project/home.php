@@ -31,8 +31,6 @@ $quoteData = getQuotesData($quoteId);
 $prevQuoteId = max(1, $quoteId - 1);
 $nextQuoteId = $quoteId + 1; // Assuming it's the next sequential ID
 
-$totalRecords = 0; // Replace this with the total number of records in your database
-
 // Retrieve the current logged-in user's user ID, email, and username
 $userId = get_user_id();
 $userEmail = get_user_email();
@@ -41,7 +39,6 @@ $username = get_username();
 // Handle the Save Quote form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveQuote'])) {
     $savedQuoteId = (int)$_POST['saveQuote'];
-    $userId = 1; // Replace with the actual user ID (if you have a logged-in user system)
 
     // Check if the user has already saved the same quote
     $db = getDB();
@@ -68,7 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveQuote'])) {
         flash("An error occurred while saving the quote", "danger");
     }
 }
-
 ?>
 
 <!DOCTYPE html>
