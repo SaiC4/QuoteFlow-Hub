@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS `Saved_Quotes` (
     `created`               TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `modified`              TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`user_id`) REFERENCES `Users`(`id`) ON DELETE CASCADE,
-    FOREIGN KEY (`quote_id`) REFERENCES `Quotes`(`id`) ON DELETE CASCADE
+    FOREIGN KEY (`user_id`) REFERENCES `Users`(`id`),
+    FOREIGN KEY (`quote_id`) REFERENCES `Quotes`(`id`)
 )
 
 /*
