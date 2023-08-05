@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS `Saved_Quotes` (
     `id`                    INT AUTO_INCREMENT NOT NULL,
     `user_id`               INT NOT NULL,
     `quote_id`              INT NOT NULL,
+    `quotes`                VARCHAR(255) NOT NULL,
+    `author`                VARCHAR(50) NOT NULL,
     `created`               TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `modified`              TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
