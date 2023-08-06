@@ -65,8 +65,26 @@ if (isset($_GET['limit'])) {
     $limit = $defaultLimit;
 }
 
+/*
+    UCID: sjc65
+    Date: 08/05/2023
+    Explanation: This block of code shows how the number of user-associated data, number of records in the database,
+    and user input for quote and author search is processed and assigned to a variable. Each variable is then
+    used in various HTML statements to display info from the database.
+*/
+// Call the function to get the total number of records in the "saved_quotes" table
+$totalSavedQuotes = getTotalSavedQuotes($user_id);
+
 // Call the function to get saved quotes data for the logged-in user
 $savedQuotesData = getSavedQuotesData($user_id, $limit);
+
+// Get the user's input for quote search and author search
+$quoteSearchTerm = isset($_GET['quoteSearch']) ? trim($_GET['quoteSearch']) : null;
+$authorSearchTerm = isset($_GET['authorSearch']) ? trim($_GET['authorSearch']) : null;
+
+// Call the function to get saved quotes data for the logged-in user with the filter criteria
+$savedQuotesData = getSavedQuotesDataWithFilter($user_id, $quoteSearchTerm, $authorSearchTerm, $limit);
+
 
 // Loop through the saved quotes data and update them with the latest info from the Quotes table
 foreach ($savedQuotesData as $quoteData) {
@@ -86,14 +104,99 @@ foreach ($savedQuotesData as $quoteData) {
             $stmt->bindParam(':quote_id', $quote_id, PDO::PARAM_INT);
             $stmt->execute();
         } catch (PDOException $e) {
-            // Handle the update error if necessary
             flash("An error occurred while updating the saved quotes", "danger");
         }
+    }
+}
+/*
+    UCID: sjc65
+    Date: 08/05/2023
+    Explanation: This function is how the filter/sort feature is processed. First the function sets a default limit
+    of 10, then the function calls the DB and selects data from both "Saved_Quotes" table and the "Quotes" table 
+    to maintain some consistency between the records but only the data from the "Saved_Quotes" table is 
+    retrieved. Then search conditions are utilized to search among the records for specific keywords/keyletters.
+    Lastly, a search validation is added to notify the user if the searched keyword does not exist in
+    the associated record type (quotes or author).
+*/
+// Filter/Sort function
+function getSavedQuotesDataWithFilter($user_id, $quoteSearchTerm = null, $authorSearchTerm = null, $limit = 10)
+{
+    $limit = max(1, min(100, (int)$limit));
+    $db = getDB();
+
+    try {
+        $query = "SELECT sq.id AS saved_id, sq.user_id, sq.quote_id, q.quotes, q.author FROM Saved_Quotes sq
+                  INNER JOIN Quotes q ON sq.quote_id = q.id
+                  WHERE sq.user_id = :user_id";
+
+        // Search conditions if search terms are provided
+        if ($quoteSearchTerm !== null) {
+            $query .= " AND q.quotes LIKE :quoteSearchTerm";
+        }
+
+        if ($authorSearchTerm !== null) {
+            $query .= " AND q.author LIKE :authorSearchTerm";
+        }
+
+        $query .= " LIMIT :limit";
+
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+
+        if ($quoteSearchTerm !== null) {
+            $quoteSearchTerm = "%" . $quoteSearchTerm . "%";
+            $stmt->bindParam(':quoteSearchTerm', $quoteSearchTerm, PDO::PARAM_STR);
+        }
+
+        if ($authorSearchTerm !== null) {
+            $authorSearchTerm = "%" . $authorSearchTerm . "%";
+            $stmt->bindParam(':authorSearchTerm', $authorSearchTerm, PDO::PARAM_STR);
+        }
+
+        $stmt->execute();
+        $savedQuotesData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // If no matching records are found
+        if (empty($savedQuotesData)) {
+            flash("No matches found", "info");
+        }
+
+        return $savedQuotesData;
+    } catch (PDOException $e) {
+        flash("An error occurred while retrieving data from the database", "danger");
+    }
+}
+
+// Function to get the total number of saved quotes for a user
+function getTotalSavedQuotes($user_id)
+{
+    $db = getDB();
+
+    try {
+        $query = "SELECT COUNT(*) AS total_saved_quotes FROM Saved_Quotes WHERE user_id = :user_id";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return (int)$result['total_saved_quotes'];
+    } catch (PDOException $e) {
+        flash("An error occurred while retrieving total saved quotes count", "danger");
+        return 0;
     }
 }
 ?>
 
 <!DOCTYPE html>
+<!--
+    UCID: sjc65
+    Date: 08/05/2023
+    Explanation: This block shows the HTML code for the page. The HTML code shows how the input fields
+    and database info are processed and displayed. The code also shows script function for the button
+    that deletes all associated data to the user. The function calls another php file 
+    (that is not listed in the website) that processes the SQL statements to delete all data in the table.
+-->
 <html>
 
 <head>
@@ -105,26 +208,68 @@ foreach ($savedQuotesData as $quoteData) {
 
 <body>
     <h2>Saved Quotes List</h2>
+    <style>
+        /* Adjusts the margin for the total records header */
+        h4 {
+            margin-top: -6px; /* higher value = more gap. lower value = less gap */
+        }
+        /* Adjusts the margin on the bottom of the buttons container */
+        .buttons-container {
+            margin-bottom: -80px; /* higher value = more gap. lower value = less gap */
+        }
+    </style>
+    <?php
+    // Get the total number of saved records for the user
+    $totalSavedRecords = count($savedQuotesData);
+    ?>
 
     <form method="get" action="">
-        <label for="limit">Records Limit (1-100):</label>
-        <input type="number" name="limit" id="limit" min="1" max="100" value="<?php echo $limit; ?>">
-        <button type="submit">Show</button>
-        <!-- Button to refresh the page -->
-        <button type="button" onclick="window.location.href = 'favorites.php';">Refresh List</button>
+        <div class="search-bars">
+            <label for="limit">Records Limit (1-100):</label>
+            <input type="number" name="limit" id="limit" min="1" max="100" value="<?php echo $limit; ?>">
+            
+            <div class="separator"></div> <!-- Vertical black line separator -->
+            
+            <label for="quoteSearch">Quote Search:</label>
+            <input type="text" name="quoteSearch" id="quoteSearch" placeholder="Enter search term">
+
+            <div class="separator"></div> <!-- Vertical black line separator -->
+
+            <label for="authorSearch">Author Search:</label>
+            <input type="text" name="authorSearch" id="authorSearch" placeholder="Enter author name">
+
+            <div class="separator"></div> <!-- Vertical black line separator -->
+
+            <button type="submit">Search</button>
+        </div>
     </form>
 
+    <div class="record-info">
+        <!-- Display the total number of records associated with logged-in user -->
+        <h4>Records associated with User: <?php echo $totalSavedQuotes; ?></h4>
+
+        <!-- Display the total number of records in the use-associated database -->
+        <h4>Total Records Shown: <?php echo count($savedQuotesData); ?></h4>
+    </div>
+    
     <div class="table-container">
         <table>
             <tr>
                 <th>Author</th>
                 <th>Quotes</th>
+                <th>Details</th>
                 <th>Delete</th>
             </tr>
             <?php foreach ($savedQuotesData as $savedQuoteData) : ?>
                 <tr>
                     <td><?php echo htmlspecialchars($savedQuoteData['author']); ?></td>
                     <td><?php echo htmlspecialchars($savedQuoteData['quotes']); ?></td>
+                    <td>
+                        <!-- Button to redirect to this record's details page -->
+                        <a href="view_details.php?quote_id=<?php echo $savedQuoteData['saved_id']; ?>">
+                            <button>Details</button>
+                        </a>
+                    </td>
                     <td>
                         <!-- Button to redirect to this record's delete page -->
                         <a href="delete_favorites.php?saved_id=<?php echo $savedQuoteData['saved_id']; ?>">
@@ -135,8 +280,20 @@ foreach ($savedQuotesData as $quoteData) {
             <?php endforeach; ?>
         </table>
     </div>
+    <div class = "buttons-container">
+        <!-- Button to refresh the page -->
+        <button type="button" onclick="window.location.href = 'favorites.php';">Refresh List</button>
+        <!-- Button to delete all saved quotes -->
+        <button type="button" id="delete-all" onclick="deleteAllSavedQuotes();">Delete All Saved Quotes</button>
+    </div>
 </body>
-
+<script>
+function deleteAllSavedQuotes() {
+    if (confirm("Are you sure you want to delete all saved quotes?")) {
+        window.location.href = 'admin/delete_user_quotes_data.php';
+    }
+}
+</script>
 </html>
 <?php
 require(__DIR__ . "/../../partials/flash.php");
