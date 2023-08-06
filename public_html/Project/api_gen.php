@@ -101,7 +101,7 @@ if ($apiQuote !== false) {
     <!-- Form to generate API quote -->
     <form method="POST">
         <input type="hidden" name="generateAPIQuote" value="1" />
-        <input type="submit" value="API Gen" name="generateAPIQuote" />
+        <input type="submit" value="Generate API Quote" name="generateAPIQuote" />
     </form>
 </body>
 
