@@ -8,6 +8,14 @@ if (!has_role("Admin")) {
 ?>
 
 <?php
+/*
+    UCID: sjc65
+    Date: 08/06/2023
+    Explanation: The purpose of this php file is to delete the user-associated record based on the record ID. This page
+    is only accessible through the delete links in each record row. The code prepares the Saved_Quotes database by
+    selecting the columns that will be affected by the deletion. Then the code executes the deletion process by deleting
+    records associated with the record ID
+*/
 if (!isset($_GET['saved_id']) || !ctype_digit($_GET['saved_id'])) {
     flash("Invalid request. Saved ID not specified", "danger");
     header("Location: " . get_url("admin/user_association.php"));

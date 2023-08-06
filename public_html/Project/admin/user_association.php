@@ -6,6 +6,14 @@ if (!has_role("Admin")) {
 }
 ?>
 <?php
+/*
+    UCID: sjc65
+    Date: 08/06/2023
+    Explanation: The purpose of this php code is to display all the user associated data in a list view. The code in this
+    snippet shows the different functions that play a role in retrieving data from the Saved_Quotes, Users, and Quotes
+    database tables. The first function retrieves data from the Saved_Quotes table, the second function retrieves data
+    from the Quotes table, and the third function gets data from the Users table.
+*/
 // Function retrieves data from 'saved_quotes' database table
 function getSavedQuotesData($user_id, $limit = 10)
 {
@@ -119,6 +127,15 @@ foreach ($savedQuotesData as $quoteData) {
     }
 }
 
+/*
+    UCID: sjc65
+    Date: 08/06/2023
+    Explanation: This function shows how the filter/sort feature is handled. The code first retrieves the data from the 
+    Saved_Quotes table and uses the search terms specified in the function paramater to search through the table. The
+    parameter variables are specified by the user's input into the HTML search bar for the associated search
+    labels. If no result is found, the code notifies the user by displaying an alert message. Because all the records
+    in the Saved_Quotes table are displayed in the list, the filter/sort function is able to work.
+*/
 // Filter/Sort function
 function getSavedQuotesDataWithFilter($user_id, $quoteSearchTerm = null, $authorSearchTerm = null, $limit = 10)
 {
@@ -257,6 +274,14 @@ function countNonApiRecords($savedQuotesData)
         }
     </style>
     <?php
+    /*
+        UCID: sjc65
+        Date: 08/06/2023
+        Explanation: This section shows the HTML of the code. The code shows how the data is ordered on the page and includes
+        several calculations for the database stats that are displayed, such as the user associated records and total records
+        stats. Further below the code shows the various links and the logics associated with them that redirect the
+        user to the edit and delete pages.
+    */
     // Gets the total number of saved records for the user
     $totalSavedRecords = count($savedQuotesData);
 
