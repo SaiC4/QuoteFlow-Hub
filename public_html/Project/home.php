@@ -7,6 +7,16 @@ if (is_logged_in(true)) {
 }
 ?>
 <?php
+/*
+    UCID: sjc65
+    Date: 08/05/2023
+    Explanation: The purpose of this code is to create a page that displays the quote and author in the center, two buttons
+    to cycle between quotes, and a save button to save the displayed quote to the "Saved_Quotes" table. In other words,
+    this page is the main part of the user-data association. First, the code retrieves the quote and author values from
+    the "Quotes" table to display it on the home page. Then a form is created to allow the user to save the quote to their
+    table. Record validation feature is added to prevent the user from saving the same quote more than once and creating 
+    duplicate records in the table.
+*/
 // Function to retrieve data from the Quotes table
 function getQuotesData($quoteId)
 {
@@ -28,8 +38,9 @@ function getQuotesData($quoteId)
 $quoteId = isset($_GET['quoteId']) ? (int)$_GET['quoteId'] : 1;
 $quoteData = getQuotesData($quoteId);
 
+// Cycles between quotes 
 $prevQuoteId = max(1, $quoteId - 1);
-$nextQuoteId = $quoteId + 1; // Assuming it's the next sequential ID
+$nextQuoteId = $quoteId + 1; 
 
 // Retrieve the current logged-in user's user ID, email, and username
 $userId = get_user_id();

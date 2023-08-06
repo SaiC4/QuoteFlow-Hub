@@ -5,7 +5,13 @@ require(__DIR__ . "/../../partials/nav.php");
 /*
     UCID: sjc65
     Date: 08/05/2023
-    Explanation:
+    Explanation: The purpose of the code is to display all the quotes the user has saved. The code creates a list, similar
+    to the list in data_list.php, delete buttons for each record, and a refresh list button. First, a function is created
+    to retrieve the ID, userID, quote, and author values from the "Saved_Quotes" table. Then another function is created
+    to retrieve the ID, userID, quote, and author values from the "Quotes" table. Then, the records from the "Saved_Quotes" 
+    table are displayed in a list with a delete button in each record to redirect the user to the delete page for the button's
+    associated record. Lastly, the values from the "Quotes" table and "Saved_Quotes" table are compared to ensure that
+    the values in "Saved_Quotes" table are updated to the latest information.
 */
 // Function retrieves data from 'saved_quotes' database table
 function getSavedQuotesData($user_id, $limit = 10)
@@ -111,14 +117,14 @@ foreach ($savedQuotesData as $quoteData) {
     <div class="table-container">
         <table>
             <tr>
-                <th>Quotes</th>
                 <th>Author</th>
+                <th>Quotes</th>
                 <th>Delete</th>
             </tr>
             <?php foreach ($savedQuotesData as $savedQuoteData) : ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($savedQuoteData['quotes']); ?></td>
                     <td><?php echo htmlspecialchars($savedQuoteData['author']); ?></td>
+                    <td><?php echo htmlspecialchars($savedQuoteData['quotes']); ?></td>
                     <td>
                         <!-- Button to redirect to this record's delete page -->
                         <a href="delete_favorites.php?saved_id=<?php echo $savedQuoteData['saved_id']; ?>">
