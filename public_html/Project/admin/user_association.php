@@ -88,11 +88,12 @@ $totalSavedQuotes = getTotalSavedQuotes($user_id);
 $savedQuotesData = getSavedQuotesData($user_id, $limit);
 
 // Get the user's input for quote search and author search
+//$nameSearchTerm = isset($_GET['nameSearch']) ? trim($_GET['nameSearch']) : null;  --> (Feature causes error)
 $quoteSearchTerm = isset($_GET['quoteSearch']) ? trim($_GET['quoteSearch']) : null;
 $authorSearchTerm = isset($_GET['authorSearch']) ? trim($_GET['authorSearch']) : null;
 
 // Call the function to get saved quotes data for the logged-in user with the filter criteria
-$savedQuotesData = getSavedQuotesDataWithFilter($user_id, $quoteSearchTerm, $authorSearchTerm, $limit);
+$savedQuotesData = getSavedQuotesDataWithFilter($user_id, $quoteSearchTerm, $authorSearchTerm, $limit); // Removed $nameSearchTerm --> (Feature causes error)
 
 
 // Loop through the saved quotes data and update them with the latest info from the Quotes table
@@ -129,7 +130,11 @@ function getSavedQuotesDataWithFilter($user_id, $quoteSearchTerm = null, $author
                   INNER JOIN Quotes q ON sq.quote_id = q.id
                   WHERE sq.user_id = :user_id";
 
-        // Search conditions if search terms are provided
+        /*// Search conditions if search terms are provided---> (Feature causes error)
+        if ($nameSearchTerm !== null) {
+            $query .= " AND u.username LIKE :nameSearchTerm";
+        } */
+
         if ($quoteSearchTerm !== null) {
             $query .= " AND q.quotes LIKE :quoteSearchTerm";
         }
@@ -143,6 +148,11 @@ function getSavedQuotesDataWithFilter($user_id, $quoteSearchTerm = null, $author
         $stmt = $db->prepare($query);
         $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+
+        /*if ($nameSearchTerm !== null) {   --> (Feature causes error)
+            $nameSearchTerm = "%" . $nameSearchTerm . "%";
+            $stmt->bindParam(':nameSearchTerm', $nameSearchTerm, PDO::PARAM_STR);
+        }*/
 
         if ($quoteSearchTerm !== null) {
             $quoteSearchTerm = "%" . $quoteSearchTerm . "%";
@@ -204,20 +214,35 @@ function countUniqueUsers($quote_id)
         return 0;
     }
 }
+
+// Function to count the number of non-API records
+function countNonApiRecords($savedQuotesData)
+{
+    $nonApiCount = 0;
+    foreach ($savedQuotesData as $savedQuoteData) {
+        $quote_id = $savedQuoteData['quote_id'];
+        $quoteInfo = getQuoteData($quote_id);
+        $api_gen = $quoteInfo['API_Gen'];
+        if ($api_gen !== 1) {
+            $nonApiCount++;
+        }
+    }
+    return $nonApiCount;
+}
 ?>
 
 <!DOCTYPE html>
 <html>
 
 <head>
-    <title>Saved Quotes List</title>
+    <title>All User Assoc.</title>
     <style>
 
     </style>
 </head>
 
 <body>
-    <h2>Saved Quotes List</h2>
+    <h2>All User Associations</h2>
     <style>
         /* Adjusts the margin for the total records header */
         h4 {
@@ -232,20 +257,27 @@ function countUniqueUsers($quote_id)
         }
     </style>
     <?php
-    // Get the total number of saved records for the user
+    // Gets the total number of saved records for the user
     $totalSavedRecords = count($savedQuotesData);
+
+    // Gets the total number of records not associated to an API
+    $userAssociatedRecords = $totalSavedQuotes - countNonApiRecords($savedQuotesData) - 1; //"-1" because there is a number order issue in the database
     ?>
 
     <form method="get" action="">
         <div class="search-bars">
-
-            <label for="authorSearch">Author Search:</label>
-            <input type="text" name="authorSearch" id="authorSearch" placeholder="Enter author name">
+            <label for="nameSearch">Name Search:</label>
+            <input type="text" name="nameSearch" id="nameSearch" placeholder="Enter name term">
 
             <div class="separator"></div> <!-- Vertical black line separator -->
 
             <label for="quoteSearch">Quote Search:</label>
-            <input type="text" name="quoteSearch" id="quoteSearch" placeholder="Enter search term">
+            <input type="text" name="quoteSearch" id="quoteSearch" placeholder="Enter quote term">
+
+            <div class="separator"></div> <!-- Vertical black line separator -->
+
+            <label for="authorSearch">Author Search:</label>
+            <input type="text" name="authorSearch" id="authorSearch" placeholder="Enter author term">
 
             <div class="separator"></div> <!-- Vertical black line separator -->
 
@@ -259,8 +291,8 @@ function countUniqueUsers($quote_id)
     </form>
 
     <div class="record-info">
-        <!-- Display the total number of records associated with logged-in user -->
-        <h4>Records associated with User: <?php echo $totalSavedQuotes; ?></h4>
+        <!-- Display the total number of records associated with user -->
+        <h4>Records associated with User: <?php echo $userAssociatedRecords; ?></h4>
 
         <!-- Display the total number of records in the use-associated database -->
         <h4>Total Records Shown: <?php echo count($savedQuotesData); ?></h4>
@@ -305,11 +337,11 @@ function countUniqueUsers($quote_id)
                     <td>
                         <!-- Redirects user to view_details.php -->
                         <a href="<?php echo get_url("view_details.php?quote_id=" . $savedQuoteData['saved_id']); ?>">
-                            <button>Back to Details</button>
+                            <button>Details</button>
                         </a>
                     </td>
                     <td>
-                        <a href="delete_favorites.php?saved_id=<?php echo $savedQuoteData['saved_id']; ?>">
+                        <a href="delete_assoc.php?saved_id=<?php echo $savedQuoteData['saved_id']; ?>">
                             <button>Delete</button>
                         </a>
                     </td>
@@ -325,10 +357,15 @@ function countUniqueUsers($quote_id)
     </div>
 </body>
 <script>
+    // Function that calls a different php page (Change the SQL statement for deletion process)
     function deleteAllSavedQuotes() {
         if (confirm("Are you sure you want to delete all saved quotes?")) {
             window.location.href = 'admin/delete_user_quotes_data.php';
         }
+    }
+    // Function to go back to previous page
+    function goBack() {
+        window.history.back();
     }
 </script>
 
