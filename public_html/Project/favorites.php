@@ -65,6 +65,13 @@ if (isset($_GET['limit'])) {
     $limit = $defaultLimit;
 }
 
+/*
+    UCID: sjc65
+    Date: 08/05/2023
+    Explanation: This block of code shows how the number of user-associated data, number of records in the database,
+    and user input for quote and author search is processed and assigned to a variable. Each variable is then
+    used in various HTML statements to display info from the database.
+*/
 // Call the function to get the total number of records in the "saved_quotes" table
 $totalSavedQuotes = getTotalSavedQuotes($user_id);
 
@@ -97,11 +104,20 @@ foreach ($savedQuotesData as $quoteData) {
             $stmt->bindParam(':quote_id', $quote_id, PDO::PARAM_INT);
             $stmt->execute();
         } catch (PDOException $e) {
-            // Handle the update error if necessary
             flash("An error occurred while updating the saved quotes", "danger");
         }
     }
 }
+/*
+    UCID: sjc65
+    Date: 08/05/2023
+    Explanation: This function is how the filter/sort feature is processed. First the function sets a default limit
+    of 10, then the function calls the DB and selects data from both "Saved_Quotes" table and the "Quotes" table 
+    to maintain some consistency between the records but only the data from the "Saved_Quotes" table is 
+    retrieved. Then search conditions are utilized to search among the records for specific keywords/keyletters.
+    Lastly, a search validation is added to notify the user if the searched keyword does not exist in
+    the associated record type (quotes or author).
+*/
 // Filter/Sort function
 function getSavedQuotesDataWithFilter($user_id, $quoteSearchTerm = null, $authorSearchTerm = null, $limit = 10)
 {
@@ -113,7 +129,7 @@ function getSavedQuotesDataWithFilter($user_id, $quoteSearchTerm = null, $author
                   INNER JOIN Quotes q ON sq.quote_id = q.id
                   WHERE sq.user_id = :user_id";
 
-        // Add search conditions if search terms are provided
+        // Search conditions if search terms are provided
         if ($quoteSearchTerm !== null) {
             $query .= " AND q.quotes LIKE :quoteSearchTerm";
         }
@@ -173,6 +189,14 @@ function getTotalSavedQuotes($user_id)
 ?>
 
 <!DOCTYPE html>
+<!--
+    UCID: sjc65
+    Date: 08/05/2023
+    Explanation: This block shows the HTML code for the page. The HTML code shows how the input fields
+    and database info are processed and displayed. The code also shows script function for the button
+    that deletes all associated data to the user. The function calls another php file 
+    (that is not listed in the website) that processes the SQL statements to delete all data in the table.
+-->
 <html>
 
 <head>
@@ -200,22 +224,21 @@ function getTotalSavedQuotes($user_id)
     ?>
 
     <form method="get" action="">
-        <!-- Add input fields for quote search and author search -->
         <div class="search-bars">
             <label for="limit">Records Limit (1-100):</label>
             <input type="number" name="limit" id="limit" min="1" max="100" value="<?php echo $limit; ?>">
             
-            <div class="separator"></div>
+            <div class="separator"></div> <!-- Vertical black line separator -->
             
             <label for="quoteSearch">Quote Search:</label>
             <input type="text" name="quoteSearch" id="quoteSearch" placeholder="Enter search term">
 
-            <div class="separator"></div>
+            <div class="separator"></div> <!-- Vertical black line separator -->
 
             <label for="authorSearch">Author Search:</label>
             <input type="text" name="authorSearch" id="authorSearch" placeholder="Enter author name">
 
-            <div class="separator"></div>
+            <div class="separator"></div> <!-- Vertical black line separator -->
 
             <button type="submit">Search</button>
         </div>
@@ -260,14 +283,13 @@ function getTotalSavedQuotes($user_id)
     <div class = "buttons-container">
         <!-- Button to refresh the page -->
         <button type="button" onclick="window.location.href = 'favorites.php';">Refresh List</button>
-        <!-- Add a button to delete all saved quotes -->
+        <!-- Button to delete all saved quotes -->
         <button type="button" id="delete-all" onclick="deleteAllSavedQuotes();">Delete All Saved Quotes</button>
     </div>
 </body>
 <script>
 function deleteAllSavedQuotes() {
     if (confirm("Are you sure you want to delete all saved quotes?")) {
-        // Redirect to a PHP script to handle the deletion
         window.location.href = 'admin/delete_user_quotes_data.php';
     }
 }
