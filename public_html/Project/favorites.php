@@ -2,6 +2,12 @@
 require(__DIR__ . "/../../partials/nav.php");
 ?>
 <?php
+/*
+    UCID: sjc65
+    Date: 08/05/2023
+    Explanation:
+*/
+// Function retrieves data from 'saved_quotes' database table
 function getSavedQuotesData($user_id, $limit = 10)
 {
     $limit = max(1, min(100, (int)$limit));
@@ -25,6 +31,25 @@ function getSavedQuotesData($user_id, $limit = 10)
     }
 }
 
+// Function retrieves data from 'Quotes' database table
+function getQuoteData($quote_id)
+{
+    $db = getDB();
+
+    try {
+        $query = "SELECT id, quotes, author FROM Quotes WHERE id = :quote_id";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':quote_id', $quote_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $quoteData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $quoteData;
+    } catch (PDOException $e) {
+        flash("An error occurred while retrieving quote data from the database", "danger");
+        return null;
+    }
+}
+
 $user_id = get_user_id();
 $defaultLimit = 10;
 
@@ -37,13 +62,28 @@ if (isset($_GET['limit'])) {
 // Call the function to get saved quotes data for the logged-in user
 $savedQuotesData = getSavedQuotesData($user_id, $limit);
 
-// Loops through the retrieved data and assigns them to variables
+// Loop through the saved quotes data and update them with the latest info from the Quotes table
 foreach ($savedQuotesData as $quoteData) {
-    $saved_id = $quoteData['saved_id'];
-    $user_id = $quoteData['user_id'];
     $quote_id = $quoteData['quote_id'];
-    $quote = $quoteData['quotes'];
-    $author = $quoteData['author'];
+    $quoteInfo = getQuoteData($quote_id);
+
+    if ($quoteInfo) {
+        $newQuote = $quoteInfo['quotes'];
+        $newAuthor = $quoteInfo['author'];
+
+        $db = getDB();
+        try {
+            $updateQuery = "UPDATE Saved_Quotes SET quotes = :newQuote, author = :newAuthor WHERE quote_id = :quote_id";
+            $stmt = $db->prepare($updateQuery);
+            $stmt->bindParam(':newQuote', $newQuote, PDO::PARAM_STR);
+            $stmt->bindParam(':newAuthor', $newAuthor, PDO::PARAM_STR);
+            $stmt->bindParam(':quote_id', $quote_id, PDO::PARAM_INT);
+            $stmt->execute();
+        } catch (PDOException $e) {
+            // Handle the update error if necessary
+            flash("An error occurred while updating the saved quotes", "danger");
+        }
+    }
 }
 ?>
 
@@ -64,6 +104,8 @@ foreach ($savedQuotesData as $quoteData) {
         <label for="limit">Records Limit (1-100):</label>
         <input type="number" name="limit" id="limit" min="1" max="100" value="<?php echo $limit; ?>">
         <button type="submit">Show</button>
+        <!-- Button to refresh the page -->
+        <button type="button" onclick="window.location.href = 'favorites.php';">Refresh List</button>
     </form>
 
     <div class="table-container">
