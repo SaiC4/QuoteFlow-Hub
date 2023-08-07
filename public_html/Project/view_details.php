@@ -113,13 +113,23 @@ if (isset($_GET['quote_id'])) {
             </div>
         </div>
         <!-- Button to go back to the Quotes list -->
-        <a href="data_list.php"><button>Back to Quotes List</button></a>
+        <!-- <a href="data_list.php"><button>Back to Quotes List</button></a> -->
+        
+        <!-- Button to go back to the previous page -->
+        <button onclick="goBack()">Go Back</button>
 
         <!-- Button to go to record edit page -->
         <a href="admin/edit_details.php?quote_id=<?php echo $quoteId; ?>"><button>Edit</button></a>
 
         <!-- Button to go to record delete page -->
         <a href="admin/delete_details.php?quote_id=<?php echo $quoteId; ?>"><button>Delete</button></a>
+        
+        <!-- Script for returning to the previous page -->
+        <script>
+        function goBack() {
+            window.history.back();
+        }
+        </script>
     <?php endif; ?>
 </body>
 
