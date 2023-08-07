@@ -82,49 +82,51 @@ if (isset($_POST["username"])) {
 </head>
 
 <body>
-    <form method="post" action="">
-        <label for="entity">Entity Identifier (Quote ID):</label>
-        <input type="number" id="entity" name="entity">
-        <br><br>
-
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" list="usernames">
-        <datalist id="usernames">
-            <?php
-            if (isset($matchedUsernames)) {
-                foreach ($matchedUsernames as $username) {
-                    echo "<option value='$username'>$username</option>";
-                }
-            }
-            ?>
-        </datalist>
-        <br><br>
-
-        <div class="buttons-container">
-            <button type="submit">Search</button>
-        </div>
+    <h1>Assign Roles</h1>
+    <form method="POST">
+        <input type="search" name="username" placeholder="Username search" />
+        <input type="submit" value="Search" />
     </form>
-
-    <?php if (isset($quoteData)) : ?>
-        <p>Quote ID: <?= $quoteData['id'] ?></p>
-        <p>Quote: <?= $quoteData['quotes'] ?></p>
-        <p>Author: <?= $quoteData['author'] ?></p>
-        <p>API Gen: <?= $quoteData['API_Gen'] ?></p>
-    <?php endif; ?>
-
-    <?php foreach ($users as $user) : ?>
-    <tr>
-        <td>
-            <label for="user_<?php se($user, 'id'); ?>"><?php se($user, "username"); ?></label>
-            <input id="user_<?php se($user, 'id'); ?>" type="checkbox" name="users[]" value="<?php se($user, 'id'); ?>" />
-        </td>
-        <td><?php se($user, "roles", "No Roles"); ?></td>
-    </tr>
-<?php endforeach; ?>
-
-</body>
-
-</html>
-<?php
-require_once(__DIR__ . "/../../../partials/flash.php");
-?>
+    <form method="POST">
+        <?php if (isset($username) && !empty($username)) : ?>
+            <input type="hidden" name="username" value="<?php se($username, false); ?>" />
+        <?php endif; ?>
+        <table style="width: 100%;">
+            <colgroup>
+                <col style="width: 70%;">
+                <col style="width: 40%;">
+            </colgroup>
+            <thead>
+                <th>Users</th>
+                <th>Quote</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <table class="inner-table">
+                            <colgroup>
+                                <col style="width: 70%;"> <!-- Adjust the width as needed -->
+                                <col style="width: 30%;"> <!-- Adjust the width as needed -->
+                            </colgroup>
+                            <?php foreach ($users as $user) : ?>
+                                <tr>
+                                    <td>
+                                        <input id="user_<?php se($user, 'id'); ?>" type="checkbox" name="users[]" value="<?php se($user, 'id'); ?>" />
+                                        <label for="user_<?php se($user, 'id'); ?>"><?php se($user, "username"); ?></label>
+                                    </td>
+                                    <td><?php se($user, "roles", "No Roles"); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </table>
+                    </td>
+                    <td>
+                        <!-- Display active roles... -->
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <input type="submit" value="Associate" />
+    </form>
+    <?php
+    require_once(__DIR__ . "/../../../partials/flash.php");
+    ?>
