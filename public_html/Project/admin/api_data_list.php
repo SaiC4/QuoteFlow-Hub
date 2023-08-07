@@ -60,7 +60,7 @@ if (isset($_GET['quoteSearch']) || isset($_GET['authorSearch']) || isset($_GET['
     $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : null;
 
     // Call the function with the search terms and limit to get filtered data
-    $quotesData = getQuotesData($quoteSearchTerm, $authorSearchTerm, $limit, true);
+    $quotesData = getQuotesData($quoteSearchTerm, $authorSearchTerm, $limit, 1);
 
     // Call the function with the search terms and limit to get filtered data
     $quotesData = getQuotesData($quoteSearchTerm, $authorSearchTerm, $limit);
@@ -86,7 +86,7 @@ if (isset($_GET['quoteSearch']) || isset($_GET['authorSearch']) || isset($_GET['
     $defaultLimit = $totalRecords;
 
     // Call the function with the default limit to get default data
-    $quotesData = getQuotesData(null, null, $defaultLimit, true);
+    $quotesData = getQuotesData(null, null, $defaultLimit, 1);
 
     // Get the count of API-generated records
     $apiGeneratedQuotes = array_filter($quotesData, function ($quoteData) {
@@ -94,10 +94,10 @@ if (isset($_GET['quoteSearch']) || isset($_GET['authorSearch']) || isset($_GET['
     });
 }
 // Get the total number of API quotes
-    $db = getDB();
-    $stmt = $db->query("SELECT COUNT(*) AS total_quotes FROM Quotes WHERE API_Gen = 1");
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    $totalQuotes = (int)$result['total_quotes'];
+$db = getDB();
+$stmt = $db->query("SELECT COUNT(*) AS total_quotes FROM Quotes WHERE API_Gen = 1");
+$result = $stmt->fetch(PDO::FETCH_ASSOC);
+$totalQuotes = (int)$result['total_quotes'];
 
 ?>
 <!DOCTYPE html>
@@ -140,9 +140,7 @@ if (isset($_GET['quoteSearch']) || isset($_GET['authorSearch']) || isset($_GET['
             <div class="separator"></div> <!-- Vertical black line separator -->
 
             <label for="limit">Records Limit (1-100):</label>
-            <input type="number" name="limit" id="limit" min="1" 
-                max="<?php echo count($apiGeneratedQuotes); ?>" 
-                value="<?php echo count($apiGeneratedQuotes); ?>">
+            <input type="number" name="limit" id="limit" min="1" max="<?php echo $totalQuotes; ?>" value="<?php echo count($apiGeneratedQuotes); ?>">
 
             <div class="separator"></div> <!-- Vertical black line separator -->
 
