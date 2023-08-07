@@ -57,7 +57,7 @@ if (isset($_GET['quoteSearch']) || isset($_GET['authorSearch']) || isset($_GET['
     // Get the search terms and limit from the user input
     $quoteSearchTerm = trim($_GET['quoteSearch']);
     $authorSearchTerm = trim($_GET['authorSearch']);
-    $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : null; // Set limit to null by default
+    $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : null;
 
     // Call the function with the search terms and limit to get filtered data
     $quotesData = getQuotesData($quoteSearchTerm, $authorSearchTerm, $limit, true);
@@ -93,6 +93,12 @@ if (isset($_GET['quoteSearch']) || isset($_GET['authorSearch']) || isset($_GET['
         return $quoteData['API_Gen'] === 1;
     });
 }
+// Get the total number of API quotes
+    $db = getDB();
+    $stmt = $db->query("SELECT COUNT(*) AS total_quotes FROM Quotes WHERE API_Gen = 1");
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $totalQuotes = (int)$result['total_quotes'];
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -146,7 +152,7 @@ if (isset($_GET['quoteSearch']) || isset($_GET['authorSearch']) || isset($_GET['
 
     <div class="record-info">
         <!-- Display the total number of records not associated with any user -->
-        <h4>Non-User Associated Records: <?php echo count($apiGeneratedQuotes); ?></h4>
+        <h4>Non-User Associated Records: <?php echo $totalQuotes; ?></h4>
 
         <!-- Display the total number of records in the list -->
         <h4>Total Records Shown: <?php echo count($apiGeneratedQuotes); ?></h4>
