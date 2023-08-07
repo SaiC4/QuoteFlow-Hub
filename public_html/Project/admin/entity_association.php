@@ -25,6 +25,35 @@ function getQuoteData($quote_id)
     }
 }
 
+// Function to retrieve the data from Saved_Quotes table and insert data into the table
+function saveQuote($userId, $savedQuoteId)
+{
+    $db = getDB();
+
+    try {
+        $stmt = $db->prepare("SELECT COUNT(*) FROM Saved_Quotes WHERE user_id = :user_id AND quote_id = :quote_id");
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindParam(':quote_id', $savedQuoteId, PDO::PARAM_INT);
+        $stmt->execute();
+        $quoteAlreadySaved = $stmt->fetchColumn();
+
+        if ($quoteAlreadySaved) {
+            flash("You have already saved this quote.");
+        } else {
+            $stmt = $db->prepare("INSERT INTO Saved_Quotes (user_id, quote_id, quotes, author) 
+                                  SELECT :user_id, id, quotes, author FROM Quotes WHERE id = :quote_id");
+            $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+            $stmt->bindParam(':quote_id', $savedQuoteId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            flash("Quote successfully saved!", "success");
+        }
+    } catch (PDOException $e) {
+        flash("An error occurred while saving the quote", "danger");
+    }
+}
+
+
 // Function to get the user's name based on username
 function getUsersByUsernamePartialMatch($searchTerm)
 {
@@ -42,10 +71,9 @@ function getUsersByUsernamePartialMatch($searchTerm)
     }
 }
 
+// Function searches names by the specified search term
 function searchUsernames($searchTerm)
 {
-    $db = getDB();
-
     $db = getDB();
 
     try {
@@ -73,12 +101,41 @@ if (isset($_POST["username"])) {
     }
 }
 
+// Search for quotes by quote ID match
 if (isset($_POST["quote_id"])) {
     $quoteId = se($_POST, "quote_id", "", false);
     if (!empty($quoteId)) {
         $quoteData = getQuoteData($quoteId);
     } else {
         flash("Quote ID must not be empty", "warning");
+    }
+}
+
+// Handle the "Associate" button form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['associateQuotes'])) {
+    $selectedUserIds = isset($_POST['users']) ? $_POST['users'] : [];
+    $selectedQuoteIds = isset($_POST['quotes']) ? $_POST['quotes'] : [];
+
+    if (empty($selectedUserIds) || empty($selectedQuoteIds)) {
+        flash("Please select users and quotes to associate", "warning");
+    } else {
+        $db = getDB();
+
+        try {
+            foreach ($selectedUserIds as $userId) {
+                foreach ($selectedQuoteIds as $quoteId) {
+                    $stmt = $db->prepare("INSERT INTO Saved_Quotes (user_id, quote_id, quotes, author)
+                                          SELECT :user_id, :quote_id, quotes, author FROM Quotes WHERE id = :quote_id");
+                    $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+                    $stmt->bindValue(':quote_id', $quoteId, PDO::PARAM_INT);
+                    $stmt->execute();
+                }
+            }
+
+            flash("Quotes successfully associated with selected users!", "success");
+        } catch (PDOException $e) {
+            flash("An error occurred while associating the quotes", "danger");
+        }
     }
 }
 
@@ -100,13 +157,13 @@ if (isset($_POST["quote_id"])) {
     <form method="POST">
         <label for="username">Username Search:</label>
         <input type="search" name="username" placeholder="Username search" />
-        
+
         <label for="quote">Entity search (quote ID):</label>
         <input type="search" name="quote_id" placeholder="Quote ID search" />
-        
+
         <input type="submit" value="Search" />
     </form>
-    <form method="POST">
+    <form method="POST" action="">
         <?php if (isset($username) && !empty($username)) : ?>
             <input type="hidden" name="username" value="<?php se($username, false); ?>" />
         <?php endif; ?>
@@ -143,6 +200,7 @@ if (isset($_POST["quote_id"])) {
                         <?php if (isset($quoteData)) : ?>
                             <table class="quote-table">
                                 <tr>
+                                    <td><input type="checkbox" name="quotes[]" value="<?= $quoteData['id'] ?>" /></td>
                                     <td><?= $quoteData['id'] ?></td>
                                     <td><?= $quoteData['quotes'] ?></td>
                                 </tr>
@@ -155,7 +213,7 @@ if (isset($_POST["quote_id"])) {
                 </tr>
             </tbody>
         </table>
-        <input type="submit" value="Associate" />
+        <input type="submit" name="associateQuotes" value="Associate" />
     </form>
     <?php
     require_once(__DIR__ . "/../../../partials/flash.php");
