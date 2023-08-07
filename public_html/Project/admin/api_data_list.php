@@ -46,7 +46,6 @@ function getQuotesData($quoteSearchTerm = null, $authorSearchTerm = null, $limit
         $quotesData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return $quotesData;
-
     } catch (PDOException $e) {
         flash("An error occured while retrieving data from the database", "danger");
         return [];
@@ -54,22 +53,29 @@ function getQuotesData($quoteSearchTerm = null, $authorSearchTerm = null, $limit
 }
 // Handle the form submission
 if (isset($_GET['quoteSearch']) || isset($_GET['authorSearch']) || isset($_GET['limit'])) {
-    
+
     // Get the search terms and limit from the user input
     $quoteSearchTerm = trim($_GET['quoteSearch']);
     $authorSearchTerm = trim($_GET['authorSearch']);
     $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : null; // Set limit to null by default
 
     // Call the function with the search terms and limit to get filtered data
+    $quotesData = getQuotesData($quoteSearchTerm, $authorSearchTerm, $limit, true);
+
+    // Call the function with the search terms and limit to get filtered data
     $quotesData = getQuotesData($quoteSearchTerm, $authorSearchTerm, $limit);
+
+    // Get the count of API-generated records
+    $apiGeneratedQuotes = array_filter($quotesData, function ($quoteData) {
+        return $quoteData['API_Gen'] === 1;
+    });
 
     // Check if the search resulted in no matches and show flash message
     if (empty($quotesData)) {
         flash("No matches found");
     }
-
 } else {
-    
+
     // Get the total number of records in the database
     $db = getDB();
     $stmt = $db->query("SELECT COUNT(*) AS total_records FROM Quotes");
@@ -80,7 +86,12 @@ if (isset($_GET['quoteSearch']) || isset($_GET['authorSearch']) || isset($_GET['
     $defaultLimit = $totalRecords;
 
     // Call the function with the default limit to get default data
-    $quotesData = getQuotesData(null, null, $defaultLimit);
+    $quotesData = getQuotesData(null, null, $defaultLimit, true);
+
+    // Get the count of API-generated records
+    $apiGeneratedQuotes = array_filter($quotesData, function ($quoteData) {
+        return $quoteData['API_Gen'] === 1;
+    });
 }
 ?>
 <!DOCTYPE html>
@@ -123,8 +134,9 @@ if (isset($_GET['quoteSearch']) || isset($_GET['authorSearch']) || isset($_GET['
             <div class="separator"></div> <!-- Vertical black line separator -->
 
             <label for="limit">Records Limit (1-100):</label>
-            <input type="number" name="limit" id="limit" min="1" max="<?php echo $totalRecords; ?>" 
-                                      value="<?php echo isset($limit) ? $limit : $defaultLimit; ?>">
+            <input type="number" name="limit" id="limit" min="1" 
+                max="<?php echo count($apiGeneratedQuotes); ?>" 
+                value="<?php echo count($apiGeneratedQuotes); ?>">
 
             <div class="separator"></div> <!-- Vertical black line separator -->
 
@@ -134,10 +146,10 @@ if (isset($_GET['quoteSearch']) || isset($_GET['authorSearch']) || isset($_GET['
 
     <div class="record-info">
         <!-- Display the total number of records not associated with any user -->
-        <h4>Records not associated with Users: <?php echo count($quotesData); ?></h4>
+        <h4>Non-User Associated Records: <?php echo count($apiGeneratedQuotes); ?></h4>
 
         <!-- Display the total number of records in the list -->
-        <h4>Total Records Shown: <?php echo count($quotesData); ?></h4>
+        <h4>Total Records Shown: <?php echo count($apiGeneratedQuotes); ?></h4>
     </div>
 
     <div class="table-container">
@@ -149,28 +161,22 @@ if (isset($_GET['quoteSearch']) || isset($_GET['authorSearch']) || isset($_GET['
                 <th>Details</th>
             </tr>
             <?php foreach ($quotesData as $quoteData) : ?>
-                <tr>
-                    <td>
-                        <?php
-                        // Check if API_Gen is null or 1
-                        if ($quoteData['API_Gen'] === null) {
-                            // Display a blank cell if it's null
-                            echo '';
-                        } elseif ($quoteData['API_Gen'] === 1) {
-                            // Display a black checkmark if it's 1
-                            echo '<span class="checkmark">&#x2713;</span>';
-                        }
-                        ?>
-                    </td>
-                    <td><?php echo htmlspecialchars($quoteData['quotes']); ?></td>
-                    <td><?php echo htmlspecialchars($quoteData['author']); ?></td>
-                    <td>
-                        <!-- Redirects user to view_details.php -->
-                        <a href="<?php echo get_url("view_details.php?quote_id=" . $quoteData['id']); ?>">
-                            <button>Details</button>
-                        </a>
-                    </td>
-                </tr>
+                <?php if ($quoteData['API_Gen'] === 1) : ?> <!-- Check if API_Gen equals 1 -->
+                    <tr>
+                        <td>
+                            <!-- Display a black checkmark -->
+                            <span class="checkmark">&#x2713;</span>
+                        </td>
+                        <td><?php echo htmlspecialchars($quoteData['quotes']); ?></td>
+                        <td><?php echo htmlspecialchars($quoteData['author']); ?></td>
+                        <td>
+                            <!-- Redirects user to view_details.php -->
+                            <a href="<?php echo get_url("view_details.php?quote_id=" . $quoteData['id']); ?>">
+                                <button>Details</button>
+                            </a>
+                        </td>
+                    </tr>
+                <?php endif; ?>
             <?php endforeach; ?>
         </table>
     </div>
