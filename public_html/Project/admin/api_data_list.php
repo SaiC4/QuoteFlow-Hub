@@ -6,6 +6,14 @@ if (!has_role("Admin")) {
 }
 ?>
 <?php
+/*
+    UCID: sjc65
+    Date: 08/06/2023
+    Explanation: The purpose of the page is to display all the non-user associated data. The function below
+    retrieves the ID, Quotes, Author, and API_Gen data from the Quotes table. This function also contains the
+    filter/sort feature. The code first gets the data from the Quotes table, then matches the search
+    terms with the results in the database.
+*/
 // Function retrieves the ID, Quote, Author, and API_Gen columns from the Quotes table
 function getQuotesData($quoteSearchTerm = null, $authorSearchTerm = null, $limit = 10)
 {
@@ -51,6 +59,13 @@ function getQuotesData($quoteSearchTerm = null, $authorSearchTerm = null, $limit
         return [];
     }
 }
+/*
+    UCID: sjc65
+    Date: 08/06/2023
+    Explanation: This block of code shows how the search form is submitted when the search button is clicked.
+    First the code gets the search terms and limit, then the code filters the results and assigns the
+    filtered results to the $quotesData variable to be used in the HTML code.
+*/
 // Handle the form submission
 if (isset($_GET['quoteSearch']) || isset($_GET['authorSearch']) || isset($_GET['limit'])) {
 
@@ -125,7 +140,15 @@ $totalQuotes = (int)$result['total_quotes'];
             /* higher value = more gap. lower value = less gap */
         }
     </style>
-
+    <!--
+        UCID: sjc65
+        Date: 08/06/2023
+        Explanation: This code shows the HTML code for the page. The HTML code shows how the search form is set up,
+        with the record limit set to the total number of records in the table (unaffected by filter/sort). Below the
+        form is the labels that display the stats of the database. Below that is the code for how the records list
+        is arranged, with a details link in each record that displays the data from the Quotes table. At the end 
+        of the script is the refresh button the refreshes the list back to the default view.
+    -->
     <form method="get" action="">
         <div class="search-bars">
 
