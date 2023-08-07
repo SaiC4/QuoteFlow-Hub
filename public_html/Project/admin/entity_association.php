@@ -6,6 +6,15 @@ if (!has_role("Admin")) {
 }
 ?>
 <?php
+/*
+    UCID: sjc65
+    Date: 08/07/2023
+    Explanation: The purpose of this code is to list the users by partial match, display the quote, the quote ID search is
+    associated with, and then associate the checkboxed users with the quote into the Saved_Quotes database. The code in
+    this snippet shows the functions that are used to retrieve the User ID , username, quote ID, and the quote. Below those
+    functions are the functions that handle the back-end code for searching for the username and searching for the
+    quote based on the quote ID.
+*/
 // Function retrieves Record ID, Quote, Author, and API_Gen data from 'Quotes' database table
 function getQuoteData($quote_id)
 {
@@ -101,7 +110,7 @@ if (isset($_POST["username"])) {
     }
 }
 
-// Search for quotes by quote ID match
+// Search for quotes by quote ID match (The quote is long and the author yields limited results so there is not partial match)
 if (isset($_POST["quote_id"])) {
     $quoteId = se($_POST, "quote_id", "", false);
     if (!empty($quoteId)) {
@@ -110,7 +119,13 @@ if (isset($_POST["quote_id"])) {
         flash("Quote ID must not be empty", "warning");
     }
 }
-
+/*
+    UCID: sjc65
+    Date: 08/07/2023
+    Explanation: This block of code handles the association between the user(s) and the quote. The code assigns the selected
+    users and the selected quote to the two variables. Then the code accesses the Saved_Quotes database and inserts
+    the user ID with the quote ID and the relevant quote information.
+*/
 // Handle the "Associate" button form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['associateQuotes'])) {
     $selectedUserIds = isset($_POST['users']) ? $_POST['users'] : [];
@@ -132,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['associateQuotes'])) {
                 }
             }
 
-            flash("Quotes successfully associated with selected users!", "success");
+            flash("User and Quote association was successful", "success");
         } catch (PDOException $e) {
             flash("An error occurred while associating the quotes", "danger");
         }
@@ -151,9 +166,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['associateQuotes'])) {
         }
     </style>
 </head>
-
+<!--
+    UCID: sjc65
+    Date: 08/07/2023
+    Explanation: This the HTML code for the page. The code shows how the username and entity search bars are set up and
+    how the form for user to entity association is set up. The form is structured with two tables, one inner table
+    inside of the Users column and one inner table inside of the Quotes column. Each user and quote has a checkbox
+    next to them to select which user the data be associated with. At the very bottom is the "associate" button that
+    activates the association code block.
+-->
 <body>
-    <h1>Assign Roles</h1>
+    <h1>User to Entity Association</h1>
     <form method="POST">
         <label for="username">Username Search:</label>
         <input type="search" name="username" placeholder="Username search" />
@@ -206,7 +229,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['associateQuotes'])) {
                                 </tr>
                             </table>
                         <?php else : ?>
-                            <!-- No quote data found or not searched yet -->
                             <p>No quote data found.</p>
                         <?php endif; ?>
                     </td>
