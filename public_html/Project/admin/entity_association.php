@@ -73,18 +73,37 @@ if (isset($_POST["username"])) {
     }
 }
 
+if (isset($_POST["quote_id"])) {
+    $quoteId = se($_POST, "quote_id", "", false);
+    if (!empty($quoteId)) {
+        $quoteData = getQuoteData($quoteId);
+    } else {
+        flash("Quote ID must not be empty", "warning");
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html>
 
 <head>
     <title>Entity Assoc.</title>
+    <style>
+        .quote-table {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
 
 <body>
     <h1>Assign Roles</h1>
     <form method="POST">
+        <label for="username">Username Search:</label>
         <input type="search" name="username" placeholder="Username search" />
+        
+        <label for="quote">Entity search (quote ID):</label>
+        <input type="search" name="quote_id" placeholder="Quote ID search" />
+        
         <input type="submit" value="Search" />
     </form>
     <form method="POST">
@@ -93,20 +112,22 @@ if (isset($_POST["username"])) {
         <?php endif; ?>
         <table style="width: 100%;">
             <colgroup>
-                <col style="width: 70%;">
-                <col style="width: 40%;">
+                <col style="width: 100%;">
+                <col style="width: 100%;">
             </colgroup>
             <thead>
-                <th>Users</th>
-                <th>Quote</th>
+                <thead>
+                    <th class="col-users">Users</th>
+                    <th class="col-quote">Quote</th>
+                </thead>
             </thead>
             <tbody>
                 <tr>
                     <td>
                         <table class="inner-table">
                             <colgroup>
-                                <col style="width: 70%;"> <!-- Adjust the width as needed -->
-                                <col style="width: 30%;"> <!-- Adjust the width as needed -->
+                                <col style="width: 70%;"> <!-- Adjust the width of the Users column -->
+                                <col style="width: 80%;"> <!-- Adjust the width of the Quote column -->
                             </colgroup>
                             <?php foreach ($users as $user) : ?>
                                 <tr>
@@ -114,13 +135,22 @@ if (isset($_POST["username"])) {
                                         <input id="user_<?php se($user, 'id'); ?>" type="checkbox" name="users[]" value="<?php se($user, 'id'); ?>" />
                                         <label for="user_<?php se($user, 'id'); ?>"><?php se($user, "username"); ?></label>
                                     </td>
-                                    <td><?php se($user, "roles", "No Roles"); ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </table>
                     </td>
                     <td>
-                        <!-- Display active roles... -->
+                        <?php if (isset($quoteData)) : ?>
+                            <table class="quote-table">
+                                <tr>
+                                    <td><?= $quoteData['id'] ?></td>
+                                    <td><?= $quoteData['quotes'] ?></td>
+                                </tr>
+                            </table>
+                        <?php else : ?>
+                            <!-- No quote data found or not searched yet -->
+                            <p>No quote data found.</p>
+                        <?php endif; ?>
                     </td>
                 </tr>
             </tbody>
