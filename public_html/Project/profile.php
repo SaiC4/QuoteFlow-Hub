@@ -17,7 +17,7 @@ is_logged_in(true);
 // Function to fetch API data and upload to Quotes table
 function generateAPIQuote()
 {
-    $url = "https://andruxnet-random-famous-quotes.p.rapidapi.com/"; // Replace with the actual API endpoint URL
+    $url = "https://andruxnet-random-famous-quotes.p.rapidapi.com/"; 
     $key = "API_KEY";
     try {
         // Send a GET request to the API endpoint
@@ -234,8 +234,8 @@ $username = get_username();
         <input type="text" name="author" id="author" />
     </div>
     <!-- <input type="hidden" name="generateAPIQuote" value="1" /> -->
-    <input type="submit" value = "API Gen" name="generateAPIQuote" />
-    <input type="submit" value="Update Profile" name="save" />
+    <!--<input type="submit" value = "API Gen" name="generateAPIQuote" />--> <!-- UNCOMMENT THIS if api gen page doesn't work-->
+        <input type="submit" value="Update Profile" name="save" />
 </form>
 
 <script>
