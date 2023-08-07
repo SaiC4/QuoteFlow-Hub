@@ -6,7 +6,82 @@ if (!has_role("Admin")) {
 }
 ?>
 <?php
+// Function retrieves the ID, Quote, Author, and API_Gen columns from the Quotes table
+function getQuotesData($quoteSearchTerm = null, $authorSearchTerm = null, $limit = 10)
+{
+    // Validate the limit value to be within the range (1 to 100)
+    $limit = max(1, min(100, (int)$limit));
+    $db = getDB();
 
+    try {
+        // Build the SQL query
+        $query = "SELECT id, quotes, author, API_Gen FROM Quotes WHERE 1";
+
+        // Add search conditions if search terms are provided
+        if ($quoteSearchTerm !== null) {
+            $query .= " AND quotes LIKE :quoteSearchTerm";
+        }
+
+        if ($authorSearchTerm !== null) {
+            $query .= " AND author LIKE :authorSearchTerm";
+        }
+
+        // Add the limit to the SQL query
+        $query .= " LIMIT :limit";
+
+        $stmt = $db->prepare($query);
+
+        if ($quoteSearchTerm !== null) {
+            $quoteSearchTerm = "%" . $quoteSearchTerm . "%";
+            $stmt->bindParam(':quoteSearchTerm', $quoteSearchTerm, PDO::PARAM_STR);
+        }
+
+        if ($authorSearchTerm !== null) {
+            $authorSearchTerm = "%" . $authorSearchTerm . "%";
+            $stmt->bindParam(':authorSearchTerm', $authorSearchTerm, PDO::PARAM_STR);
+        }
+
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        $quotesData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $quotesData;
+
+    } catch (PDOException $e) {
+        flash("An error occured while retrieving data from the database", "danger");
+        return [];
+    }
+}
+// Handle the form submission
+if (isset($_GET['quoteSearch']) || isset($_GET['authorSearch']) || isset($_GET['limit'])) {
+    
+    // Get the search terms and limit from the user input
+    $quoteSearchTerm = trim($_GET['quoteSearch']);
+    $authorSearchTerm = trim($_GET['authorSearch']);
+    $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : null; // Set limit to null by default
+
+    // Call the function with the search terms and limit to get filtered data
+    $quotesData = getQuotesData($quoteSearchTerm, $authorSearchTerm, $limit);
+
+    // Check if the search resulted in no matches and show flash message
+    if (empty($quotesData)) {
+        flash("No matches found");
+    }
+
+} else {
+    
+    // Get the total number of records in the database
+    $db = getDB();
+    $stmt = $db->query("SELECT COUNT(*) AS total_records FROM Quotes");
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $totalRecords = (int)$result['total_records'];
+
+    // Set the default limit to the total number of records
+    $defaultLimit = $totalRecords;
+
+    // Call the function with the default limit to get default data
+    $quotesData = getQuotesData(null, null, $defaultLimit);
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -33,10 +108,6 @@ if (!has_role("Admin")) {
             /* higher value = more gap. lower value = less gap */
         }
     </style>
-    <?php
-    // Gets the total number of saved records for the user
-    $totalSavedRecords = count($savedQuotesData);
-    ?>
 
     <form method="get" action="">
         <div class="search-bars">
@@ -52,7 +123,8 @@ if (!has_role("Admin")) {
             <div class="separator"></div> <!-- Vertical black line separator -->
 
             <label for="limit">Records Limit (1-100):</label>
-            <input type="number" name="limit" id="limit" min="1" max="100" value="<?php echo $limit; ?>">
+            <input type="number" name="limit" id="limit" min="1" max="<?php echo $totalRecords; ?>" 
+                                      value="<?php echo isset($limit) ? $limit : $defaultLimit; ?>">
 
             <div class="separator"></div> <!-- Vertical black line separator -->
 
@@ -61,40 +133,40 @@ if (!has_role("Admin")) {
     </form>
 
     <div class="record-info">
-        <!-- Display the total number of records associated with user -->
-        <h4>Records not associated with Users:  </h4>
+        <!-- Display the total number of records not associated with any user -->
+        <h4>Records not associated with Users: <?php echo count($quotesData); ?></h4>
 
-        <!-- Display the total number of records in the use-associated database -->
-        <h4>Total Records Shown: <?php echo count($savedQuotesData); ?></h4>
+        <!-- Display the total number of records in the list -->
+        <h4>Total Records Shown: <?php echo count($quotesData); ?></h4>
     </div>
 
     <div class="table-container">
         <table>
             <tr>
+                <th>API</th>
                 <th>Quotes</th>
                 <th>Author</th>
                 <th>Details</th>
             </tr>
-            <?php foreach ($savedQuotesData as $savedQuoteData) : ?>
-                <?php
-                // Retrieve the user ID associated with the current saved quotes
-                $quote_user_id = $savedQuoteData['user_id'];
-
-                // Retrieve the API gen value from the quote data
-                $quote_info = getQuoteData($quote_id);
-                $api_gen = $quote_info['API_Gen'];
-
-                // If the record was created by the API, use *API* for the user name
-                if ($api_gen === 1) {
-                    $quote_user_name = "*API*";
-                }
-                ?>
+            <?php foreach ($quotesData as $quoteData) : ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($savedQuoteData['quotes']); ?></td>
-                    <td><?php echo htmlspecialchars($savedQuoteData['author']); ?></td>
+                    <td>
+                        <?php
+                        // Check if API_Gen is null or 1
+                        if ($quoteData['API_Gen'] === null) {
+                            // Display a blank cell if it's null
+                            echo '';
+                        } elseif ($quoteData['API_Gen'] === 1) {
+                            // Display a black checkmark if it's 1
+                            echo '<span class="checkmark">&#x2713;</span>';
+                        }
+                        ?>
+                    </td>
+                    <td><?php echo htmlspecialchars($quoteData['quotes']); ?></td>
+                    <td><?php echo htmlspecialchars($quoteData['author']); ?></td>
                     <td>
                         <!-- Redirects user to view_details.php -->
-                        <a href="<?php echo get_url("view_details.php?quote_id=" . $savedQuoteData['saved_id']); ?>">
+                        <a href="<?php echo get_url("view_details.php?quote_id=" . $quoteData['id']); ?>">
                             <button>Details</button>
                         </a>
                     </td>
@@ -108,12 +180,6 @@ if (!has_role("Admin")) {
     </div>
 </body>
 <script>
-    // Function that calls a different php page (Change the SQL statement for deletion process)
-    function deleteAllSavedQuotes() {
-        if (confirm("Are you sure you want to delete all saved quotes?")) {
-            window.location.href = 'admin/delete_user_quotes_data.php';
-        }
-    }
     // Function to go back to previous page
     function goBack() {
         window.history.back();
