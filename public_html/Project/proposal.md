@@ -17,9 +17,9 @@
 
  - [Milestone 1 Board](https://github.com/users/sjc65/projects/4)
  
- - [Milestone 1 Board](https://github.com/users/sjc65/projects/6)
+ - [Milestone 2 Board](https://github.com/users/sjc65/projects/6)
  
- - [Milestone 1 Board](https://github.com/users/sjc65/projects/7)
+ - [Milestone 3 Board](https://github.com/users/sjc65/projects/7)
 
 ## Project Proposal Overview
 
